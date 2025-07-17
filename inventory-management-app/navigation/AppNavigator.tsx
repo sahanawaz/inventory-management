@@ -14,7 +14,7 @@ const AppNavigator = () => {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ title: "POS System" }}
+          options={{ title: "Inventory Management System" }}
         />
         <Stack.Screen
           name="Billing"
