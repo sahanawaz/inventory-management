@@ -1,0 +1,102 @@
+package inv.mgm.services.Entity;
+
+import jakarta.persistence.*;
+
+import java.time.LocalDate;
+
+@Entity
+public class InventoryInfo {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+    @ManyToOne
+    @JoinColumn(name = "inventory_id", referencedColumnName = "id")
+    private Inventory inventory;
+    @ManyToOne
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
+    private InventoryCategory categoryId;
+    private Integer purchasedQuantity;
+    private Integer soldQuantity;
+    private String inventorySku;
+    private Integer stampUser;
+    private LocalDate stampDate;
+
+    public InventoryInfo() {
+        // Default constructor
+    }
+    public InventoryInfo(Integer id, Inventory inventory, InventoryCategory categoryId, Integer purchasedQuantity, Integer soldQuantity, String inventorySku, Integer stampUser, LocalDate stampDate) {
+        this.id = id;
+        this.inventory = inventory;
+        this.categoryId = categoryId;
+        this.purchasedQuantity = purchasedQuantity;
+        this.soldQuantity = soldQuantity;
+        this.inventorySku = inventorySku;
+        this.stampUser = stampUser;
+        this.stampDate = stampDate;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(Inventory inventory) {
+        this.inventory = inventory;
+    }
+
+    public InventoryCategory getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(InventoryCategory categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Integer getPurchasedQuantity() {
+        return purchasedQuantity;
+    }
+
+    public void setPurchasedQuantity(Integer purchasedQuantity) {
+        this.purchasedQuantity = purchasedQuantity;
+    }
+
+    public Integer getSoldQuantity() {
+        return soldQuantity;
+    }
+
+    public void setSoldQuantity(Integer soldQuantity) {
+        this.soldQuantity = soldQuantity;
+    }
+
+    public String getInventorySku() {
+        return inventorySku;
+    }
+
+    public void setInventorySku(String inventorySku) {
+        this.inventorySku = inventorySku;
+    }
+
+    public Integer getStampUser() {
+        return stampUser;
+    }
+
+    public void setStampUser(Integer stampUser) {
+        this.stampUser = stampUser;
+    }
+
+    public LocalDate getStampDate() {
+        return stampDate;
+    }
+
+    public void setStampDate(LocalDate stampDate) {
+        this.stampDate = stampDate;
+    }
+}
