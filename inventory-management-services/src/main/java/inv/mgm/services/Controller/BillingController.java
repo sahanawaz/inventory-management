@@ -19,7 +19,7 @@ public class BillingController {
     @PostMapping("/createBill")
         public ResponseEntity<String> createBill(@RequestBody CustomerBillModel customerBill) {
             try {
-                logger.info("Received bill for customer: {}", customerBill.getCustomerId());
+                logger.info("Received bill for customer: {}", customerBill.getCustomer().getName());
                 billingService.processBill(customerBill);
                 return ResponseEntity.ok("Bill processed successfully");
             } catch (Exception e) {
