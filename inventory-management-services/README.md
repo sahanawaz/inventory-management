@@ -25,4 +25,8 @@ A Spring Boot application for managing users, inventory, and billing with Postgr
    
 3. Update the `application.properties` file with your PostgreSQL credentials:
    ```properties
+   spring.datasource.url=jdbc:postgresql://localhost:5432/shine_collection
+   spring.datasource.username=postgres
+   spring.datasource.password=admin
+   ```
    
