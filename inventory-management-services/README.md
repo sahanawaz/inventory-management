@@ -27,6 +27,6 @@ A Spring Boot application for managing users, inventory, and billing with Postgr
    ```properties
    spring.datasource.url=jdbc:postgresql://localhost:5432/shine_collection
    spring.datasource.username=postgres
-   spring.datasource.password=admin
+   spring.datasource.password=postgres
    ```
    
