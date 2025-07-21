@@ -9,4 +9,8 @@ public interface BillingRepository extends JpaRepository<BillingRepository, Long
     // For example, find by billing date or customer ID
     // List<Billing> findByBillingDate(Date billingDate);
     // List<Billing> findByCustomerId(Long customerId);
+    // Inherited from JpaRepository: List<BillingRepository> findAll();
+
+
+
 }
