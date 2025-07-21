@@ -20,7 +20,7 @@ A Spring Boot application for managing users, inventory, and billing with Postgr
 1. Clone the repository:
 2. Create a DB in PostgreSQL:
    ```sql
-   CREATE DATABASE shine_collection_services;
+   CREATE DATABASE shine_collection;
    ```
    
 3. Update the `application.properties` file with your PostgreSQL credentials:
