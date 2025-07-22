@@ -1,4 +1,4 @@
-# Shine Collection Services
+# Inventory Management Service 
 
 A Spring Boot application for managing users, inventory, and billing with PostgreSQL.
 
