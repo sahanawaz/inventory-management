@@ -3,6 +3,7 @@ package inv.mgm.services.Entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 public class InventoryCategory {
@@ -21,6 +22,8 @@ public class InventoryCategory {
     private SysOption dimension;
     private Integer stampUser;
     private LocalDate stampDate;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    private List<InventoryInfo> inventoryInfoList;
 
     public InventoryCategory() {
         // Default constructor
@@ -81,4 +84,12 @@ public class InventoryCategory {
     public void setStampDate(LocalDate stampDate) {
         this.stampDate = stampDate;
     }
+
+//    public List<InventoryInfo> getInventoryInfoList() {
+//        return inventoryInfoList;
+//    }
+//
+//    public void setInventoryInfoList(List<InventoryInfo> inventoryInfoList) {
+//        this.inventoryInfoList = inventoryInfoList;
+//    }
 }

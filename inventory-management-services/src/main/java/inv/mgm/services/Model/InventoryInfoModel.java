@@ -1,35 +1,27 @@
-package inv.mgm.services.Entity;
+package inv.mgm.services.Model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
+import inv.mgm.services.Entity.Inventory;
+import inv.mgm.services.Entity.InventoryCategory;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 import java.time.LocalDate;
 
-@Entity
-public class InventoryInfo {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+public class InventoryInfoModel {
     private Integer id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "inventory_id", referencedColumnName = "id")
-//    @JsonBackReference
-    private Inventory inventory;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", referencedColumnName = "id")
-//    @JsonBackReference
-    private InventoryCategory categoryId;
+    private InventoryModel inventory;
+    private InventoryCategoryModel categoryId;
     private Integer purchasedQuantity;
     private Integer soldQuantity;
     private String inventorySku;
     private Integer stampUser;
     private LocalDate stampDate;
 
-    public InventoryInfo() {
+    public InventoryInfoModel() {
         // Default constructor
     }
-    public InventoryInfo(Integer id, Inventory inventory, InventoryCategory categoryId, Integer purchasedQuantity, Integer soldQuantity, String inventorySku, Integer stampUser, LocalDate stampDate) {
+    public InventoryInfoModel(Integer id, InventoryModel inventory, InventoryCategoryModel categoryId, Integer purchasedQuantity, Integer soldQuantity, String inventorySku, Integer stampUser, LocalDate stampDate) {
         this.id = id;
         this.inventory = inventory;
         this.categoryId = categoryId;
@@ -48,19 +40,19 @@ public class InventoryInfo {
         this.id = id;
     }
 
-    public Inventory getInventory() {
+    public InventoryModel getInventory() {
         return inventory;
     }
 
-    public void setInventory(Inventory inventory) {
+    public void setInventory(InventoryModel inventory) {
         this.inventory = inventory;
     }
 
-    public InventoryCategory getCategoryId() {
+    public InventoryCategoryModel getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(InventoryCategory categoryId) {
+    public void setCategoryId(InventoryCategoryModel categoryId) {
         this.categoryId = categoryId;
     }
 

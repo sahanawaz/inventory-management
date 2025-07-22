@@ -1,12 +1,12 @@
 package inv.mgm.services.Service;
-
-import inv.mgm.services.Entity.Inventory;
-import inv.mgm.services.Model.StocksModel;
+import inv.mgm.services.Entity.InventoryInfo;
 import inv.mgm.services.Repository.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class InventoryServiceImpl implements InventoryService{
     @Autowired
     InventoryRepository inventoryRepository;
@@ -14,11 +14,20 @@ public class InventoryServiceImpl implements InventoryService{
      * @return
      */
     @Override
-    public List<Inventory> getAllStocks() {
-        List<Inventory> inventories = inventoryRepository.findAll();
-
-
-        return inventories;
+    public List<InventoryInfo> getAllStocks() {
+        // Fetch all inventory stocks from the repository
+//        .orElseThrow(() -> new RuntimeException("Product not found"))
+        return inventoryRepository.findAll();
     }
+
+    /**
+     * @param sku
+     * @return
+     */
+    @Override
+    public List<InventoryInfo> getStockBySku(String sku) {
+        return inventoryRepository.findByInventorySku(sku);
+    }
+
 
 }

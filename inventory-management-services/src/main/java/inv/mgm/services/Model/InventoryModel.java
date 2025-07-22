@@ -1,33 +1,24 @@
-package inv.mgm.services.Entity;
-
-import jakarta.persistence.*;
+package inv.mgm.services.Model;
 
 import java.time.LocalDate;
-import java.util.List;
 
-@Entity
-public class Inventory {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+public class InventoryModel {
     private Integer id;
     private Double unitCp;
     private Double unitSp;
     private LocalDate date;
     private Integer stampUser;
     private LocalDate stampDate;
-//    @OneToOne(fetch = FetchType.LAZY)
-//    List<InventoryInfo> inventoryInfoList;
-
-    public Inventory(Integer id, Double unityCp, Double unitySp, LocalDate date, Integer stampUser, LocalDate stampDate) {
+    public InventoryModel() {
+        // Default constructor
+    }
+    public InventoryModel(Integer id, Double unitCp, Double unitSp, LocalDate date, Integer stampUser, LocalDate stampDate) {
         this.id = id;
-        this.unitCp = unityCp;
-        this.unitSp = unitySp;
+        this.unitCp = unitCp;
+        this.unitSp = unitSp;
         this.date = date;
         this.stampUser = stampUser;
         this.stampDate = stampDate;
-    }
-    public Inventory() {
-        // Default constructor
     }
 
     public Integer getId() {
@@ -77,12 +68,4 @@ public class Inventory {
     public void setStampDate(LocalDate stampDate) {
         this.stampDate = stampDate;
     }
-
-//    public List<InventoryInfo> getInventoryInfoList() {
-//        return inventoryInfoList;
-//    }
-//
-//    public void setInventoryInfoList(List<InventoryInfo> inventoryInfoList) {
-//        this.inventoryInfoList = inventoryInfoList;
-//    }
 }
