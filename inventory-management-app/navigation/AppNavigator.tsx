@@ -4,17 +4,39 @@ import HomeScreen from "../components/HomeScreen";
 import BillingScreen from "../components/BillingScreen";
 import InventoryScreen from "../components/InventoryScreen";
 import { RootStackParamList } from "../shared/SharedConstants";
+import GradientBackground from "../utils/GradientBackground";
+import { Platform, View } from "react-native";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          headerStyle: {
+            height: Platform.OS === "ios" ? 100 : 80,
+            backgroundColor: "transparent",
+            elevation: 0,
+          },
+          headerTitleStyle: {
+            color: "#d4af37",
+            fontSize: 20,
+            fontFamily: Platform.OS === "ios" ? "Georgia" : "serif",
+          },
+          headerTintColor: "#d4af37",
+          headerBackground: () => (
+            <GradientBackground>
+              <View style={{ flex: 1 }} />
+            </GradientBackground>
+          ),
+        }}
+      >
         <Stack.Screen
           name="Home"
           component={HomeScreen}
-          options={{ title: "POS System" }}
+          options={{ title: "Inventory Management System" }}
         />
         <Stack.Screen
           name="Billing"
