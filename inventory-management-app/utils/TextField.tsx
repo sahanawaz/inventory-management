@@ -9,15 +9,16 @@ interface TxtProp {
   label: any;
   themeProp?: any;
   keyboardType?: any;
+  mode?: "flat" | "outlined" | undefined;
 }
 
-const DEFAULT_THEME = {
+export const DEFAULT_THEME_TXT = {
   colors: {
-    primary: "#d4af37",
+    primary: DEFAULT_THEME_COLOR,
     background: "rgba(255,255,255,0.1)",
   },
 };
-const DEFAULT_STYLES = {
+export const DEFAULT_STYLES = {
   input: {
     marginBottom: 16,
     backgroundColor: "rgba(255,255,255,0.1)",
@@ -26,17 +27,20 @@ const DEFAULT_STYLES = {
   placeholderTextColor: DEFAULT_THEME_COLOR,
 };
 const DEFAULT_KEYBOARD_TYPE = "name-phone-pad";
+const DEFAULT_MODE = "flat";
 
 const TextField: React.FC<TxtProp> = ({
   styles = DEFAULT_STYLES,
   onChangeHandler,
   value,
   label,
-  themeProp = DEFAULT_THEME,
+  themeProp = DEFAULT_THEME_TXT,
   keyboardType = DEFAULT_KEYBOARD_TYPE,
+  mode = DEFAULT_MODE,
 }) => {
   return (
     <TextInput
+      mode={mode}
       label={label}
       value={value}
       onChangeText={onChangeHandler}

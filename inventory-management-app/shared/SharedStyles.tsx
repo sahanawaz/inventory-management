@@ -41,3 +41,10 @@ export const modalStyles = StyleSheet.create({
     padding: 0,
   },
 });
+
+export const textFieldStyles = StyleSheet.create({
+  sectionTitle: {
+    color: DEFAULT_THEME_COLOR,
+    marginBottom: 12,
+  },
+});

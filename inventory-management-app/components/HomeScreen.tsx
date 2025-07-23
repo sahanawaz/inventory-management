@@ -11,7 +11,7 @@ import { RootStackParamList } from "../shared/SharedConstants";
 //   Text,
 // } from "react-native-paper";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -23,6 +23,7 @@ import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Card, Text } from "react-native-paper";
 import GradientBackground from "../utils/GradientBackground";
 import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
+import { CallApiGet } from "../utils/ServiceHelper";
 
 type HomeScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "Home">;
@@ -37,6 +38,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     productsIn: 24,
     productsOut: 12,
   };
+
+  useEffect(() => {
+    const func = async () => {
+      const dummyJsonResp = await CallApiGet("posts/1");
+      console.log(dummyJsonResp);
+    };
+    func();
+  }, []);
   return (
     <GradientBackground>
       <SafeAreaView style={styles.safeArea}>
