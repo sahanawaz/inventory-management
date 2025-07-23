@@ -13,6 +13,7 @@ import { DEFAULT_THEME_COLOR, initlAlertConfig } from "../utils/SysConsts";
 import AddSkuModal from "./AddSkuModal";
 import DiscountModal from "./DiscountModal";
 import AlertModal from "../utils/AlertModal";
+import { textFieldStyles } from "../shared/SharedStyles";
 
 const initCustBillObj = {
   customer: {
@@ -153,7 +154,7 @@ const BillingScreen: React.FC = () => {
 
       <TextField
         label={
-          <Text style={styles.sectionTitle} variant="titleMedium">
+          <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
             Customer Name *
           </Text>
         }
@@ -163,7 +164,7 @@ const BillingScreen: React.FC = () => {
 
       <TextField
         label={
-          <Text style={styles.sectionTitle} variant="titleMedium">
+          <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
             Phone No. *
           </Text>
         }
@@ -174,7 +175,7 @@ const BillingScreen: React.FC = () => {
 
       {/* Products Section */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle} variant="titleLarge">
+        <Text style={textFieldStyles.sectionTitle} variant="titleLarge">
           Products
         </Text>
         <Button
@@ -299,10 +300,7 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 32,
   },
-  sectionTitle: {
-    color: DEFAULT_THEME_COLOR,
-    marginBottom: 12,
-  },
+
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",

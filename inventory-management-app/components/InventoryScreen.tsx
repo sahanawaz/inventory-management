@@ -12,15 +12,20 @@ import { dropdownOptions } from "../utils/SysData";
 import GradientBackground from "../utils/GradientBackground";
 import { SelectList } from "react-native-dropdown-select-list";
 import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
+import TextField, {
+  DEFAULT_STYLES,
+  DEFAULT_THEME_TXT,
+} from "../utils/TextField";
+import { textFieldStyles } from "../shared/SharedStyles";
 
 type FormData = {
-  category: string;
-  metalType: string;
-  purity: string;
-  supplier: string;
-  weight: string;
-  quantity: string;
-  price: string;
+  categoryType: number;
+  inventoryType: number;
+  color: number;
+  dimension: number;
+  unitCp: number;
+  unitSp: number;
+  qty: number;
   date: Date;
 };
 
@@ -28,40 +33,42 @@ type FormDataKeys = keyof FormData;
 
 const InventoryScreen = () => {
   const [formData, setFormData] = useState<FormData>({
-    category: "",
-    metalType: "",
-    purity: "",
-    supplier: "",
-    weight: "",
-    quantity: "",
-    price: "",
+    categoryType: 0,
+    inventoryType: 0,
+    color: 0,
+    dimension: 0,
+    unitCp: 0,
+    unitSp: 0,
+    qty: 0,
     date: new Date(),
   });
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleChange = (field: string, value: string | Date) => {
+  const handleChange = (field: string, value: number | Date) => {
     setFormData({ ...formData, [field]: value });
     if (field === "date") {
       setShowDatePicker(false);
     }
   };
 
-  const handleSelect = (field: FormDataKeys, value: string) => {
+  const handleSelect = (field: FormDataKeys, value: number) => {
     setFormData({ ...formData, [field]: value });
   };
 
   const renderDropdown = (
     field: FormDataKeys,
     label: string,
-    options: Array<{ key: string; value: string }>
+    options: Array<{ key: number; value: string }>
   ) => (
     <View style={styles.dropdownContainer}>
-      <Text style={[styles.label, { color: "#d4af37" }]}>{label} *</Text>
+      <Text style={[styles.label, { color: DEFAULT_THEME_COLOR }]}>
+        {label} *
+      </Text>
       <SelectList
         data={options}
-        setSelected={(val: string) => handleSelect(field, val)}
+        setSelected={(val: number) => handleSelect(field, val)}
         search={true}
         placeholder={`Select ${label.toLowerCase()}`}
         boxStyles={styles.dropdownBox}
@@ -71,7 +78,9 @@ const InventoryScreen = () => {
         inputStyles={styles.inputText}
         searchPlaceholder={`Search ${label.toLowerCase()}...`}
         searchicon={<Text style={{ marginRight: 10 }}>🔍</Text>}
-        arrowicon={<Text style={{ color: "#d4af37", marginLeft: 10 }}>▼</Text>}
+        arrowicon={
+          <Text style={{ color: DEFAULT_THEME_COLOR, marginLeft: 10 }}>▼</Text>
+        }
       />
     </View>
   );
@@ -80,60 +89,56 @@ const InventoryScreen = () => {
     <GradientBackground style={styles.container}>
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {/* Dropdowns */}
-        {renderDropdown("category", "Category", dropdownOptions.category)}
-        {renderDropdown("metalType", "Metal Type", dropdownOptions.metalType)}
-        {renderDropdown("purity", "Purity", dropdownOptions.purity)}
-        {renderDropdown("supplier", "Supplier", dropdownOptions.supplier)}
+        {renderDropdown(
+          "categoryType",
+          "Category Type",
+          dropdownOptions.categoryType
+        )}
+        {renderDropdown(
+          "inventoryType",
+          "Inventory Type",
+          dropdownOptions.inventoryType
+        )}
+        {renderDropdown("color", "Color", dropdownOptions.color)}
+        {renderDropdown("dimension", "Dimension", dropdownOptions.dimension)}
 
         {/* Other inputs remain the same as previous implementation */}
         {/* Weight Input */}
-        <TextInput
-          label="Weight (grams) *"
-          value={formData.weight}
-          onChangeText={(text) => handleChange("weight", text)}
-          mode="outlined"
+        <TextField
+          label={
+            <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
+              Unit Cost Price *
+            </Text>
+          }
+          value={formData.unitCp.toString()}
+          onChangeHandler={(v: any) =>
+            handleChange("unitCp", parseFloat(v) || 0)
+          }
           keyboardType="numeric"
-          style={styles.input}
-          theme={{
-            colors: {
-              primary: "#d4af37",
-              background: "rgba(255,255,255,0.1)",
-              text: "#ffffff",
-            },
-          }}
         />
-        {/* Quantity Input */}
-        <TextInput
-          label="Quantity *"
-          value={formData.quantity}
-          onChangeText={(text) => handleChange("quantity", text)}
-          mode="outlined"
+        <TextField
+          label={
+            <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
+              Unit Selling Price *
+            </Text>
+          }
+          value={formData.unitSp.toString()}
+          onChangeHandler={(v: any) =>
+            handleChange("unitSp", parseFloat(v) || 0)
+          }
           keyboardType="numeric"
-          style={styles.input}
-          theme={{
-            colors: {
-              primary: "#d4af37",
-              background: "rgba(255,255,255,0.1)",
-              text: "#ffffff",
-            },
-          }}
         />
-        {/* Price Input */}
-        <TextInput
-          label="Price (₹) *"
-          value={formData.price}
-          onChangeText={(text) => handleChange("price", text)}
-          mode="outlined"
+        <TextField
+          label={
+            <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
+              Quantity
+            </Text>
+          }
+          value={formData.qty.toString()}
+          onChangeHandler={(v: any) => handleChange("qty", parseFloat(v) || 0)}
           keyboardType="numeric"
-          style={styles.input}
-          theme={{
-            colors: {
-              primary: "#d4af37",
-              background: "rgba(255,255,255,0.1)",
-              text: "#ffffff",
-            },
-          }}
         />
+
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Date *</Text>
           <Button
@@ -162,7 +167,7 @@ const InventoryScreen = () => {
 
         <Button
           mode="contained"
-          onPress={() => console.log("Add Inventory")}
+          onPress={() => console.log(formData)}
           style={styles.addButton}
           labelStyle={styles.buttonLabel}
         >
@@ -186,7 +191,7 @@ const styles = StyleSheet.create({
     zIndex: 1, // Ensure dropdowns appear above other elements
   },
   label: {
-    color: "#d4af37",
+    color: DEFAULT_THEME_COLOR,
     marginBottom: 8,
     fontSize: 14,
   },
@@ -196,13 +201,12 @@ const styles = StyleSheet.create({
   },
   dropdownBox: {
     backgroundColor: "rgba(255,255,255,0.1)",
-    borderColor: "#d4af37",
-    borderRadius: 30,
+    borderColor: DEFAULT_THEME_COLOR,
     paddingVertical: 12,
   },
   dropdownList: {
     backgroundColor: "rgba(58,58,68,0.95)",
-    borderColor: "#d4af37",
+    borderColor: DEFAULT_THEME_COLOR,
     marginTop: 4,
   },
   dropdownItem: {
@@ -215,13 +219,13 @@ const styles = StyleSheet.create({
   },
   addButton: {
     marginTop: 24,
-    backgroundColor: "#d4af37",
+    backgroundColor: DEFAULT_THEME_COLOR,
   },
   buttonLabel: {
     color: "#000000",
   },
   dateButton: {
-    borderColor: "#d4af37",
+    borderColor: DEFAULT_THEME_COLOR,
     backgroundColor: "rgba(255,255,255,0.1)",
   },
   input: {

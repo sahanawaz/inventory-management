@@ -48,30 +48,30 @@ export const inventoryItems = [
 
 // Sample data
 export const dropdownOptions = {
-  category: [
-    { key: "1", value: "Gold Rings" },
-    { key: "2", value: "Diamond Rings" },
-    { key: "3", value: "Silver Rings" },
-    { key: "4", value: "Platinum Rings" },
-    { key: "5", value: "Gold Necklaces" },
-    { key: "6", value: "Diamond Necklaces" },
+  categoryType: [
+    { key: 1, value: "Design" },
+    { key: 2, value: "Price" },
+    { key: 3, value: "Company" },
   ],
-  metalType: [
-    { key: "1", value: "Gold" },
-    { key: "2", value: "Silver" },
-    { key: "3", value: "Platinum" },
-    { key: "4", value: "Diamond" },
+  inventoryType: [
+    { key: 1, value: "Bangles" },
+    { key: 2, value: "Necklace" },
+    { key: 3, value: "Perfume" },
+    { key: 4, value: "Earings" },
+    { key: 5, value: "Nailpolish" },
+    { key: 6, value: "Lipstick" },
+    { key: 7, value: "Others" },
   ],
-  purity: [
-    { key: "1", value: "24K" },
-    { key: "2", value: "22K" },
-    { key: "3", value: "18K" },
-    { key: "4", value: "14K" },
+  dimension: [
+    { key: 1, value: "2/4" },
+    { key: 2, value: "2/2" },
+    { key: 3, value: "2/8K" },
+    { key: 4, value: "2/10" },
   ],
-  supplier: [
-    { key: "1", value: "Mittal Jewellers" },
-    { key: "2", value: "Tanishq" },
-    { key: "3", value: "Kalyan Jewellers" },
+  color: [
+    { key: 1, value: "Red" },
+    { key: 2, value: "Green" },
+    { key: 3, value: "Yellow" },
   ],
 };
 export const ledgerData = [
