@@ -119,6 +119,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               </Card.Content>
             </Card>
           </TouchableOpacity>
+          {/* Ledger */}
+          <TouchableOpacity onPress={() => navigation.navigate("Ledger")}>
+            <Card style={styles.actionCard}>
+              <Card.Content style={styles.actionCardContent}>
+                <MaterialIcons
+                  name="menu-book"
+                  size={48}
+                  color="#d4af37"
+                  onPress={() => navigation.navigate("Ledger")}
+                />
+                <Text style={styles.actionCardTitle}>Ledger</Text>
+              </Card.Content>
+            </Card>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     </GradientBackground>
@@ -190,6 +204,8 @@ const styles = StyleSheet.create({
   },
   actionCardsContainer: {
     flexDirection: "row",
+    display: "flex",
+    flexWrap: "wrap" as const,
     justifyContent: "space-between",
     marginTop: 10,
   },

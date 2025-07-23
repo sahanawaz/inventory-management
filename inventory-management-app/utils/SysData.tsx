@@ -74,3 +74,78 @@ export const dropdownOptions = {
     { key: "3", value: "Kalyan Jewellers" },
   ],
 };
+export const ledgerData = [
+    {
+      date: '23/01',
+      sku: 'NK001',
+      product: 'Gold Necklace',
+      quantity: 5,
+      costPrice: 2500,
+      sellPrice: 3200,
+      profit: 700
+    },
+    {
+      date: '23/01',
+      sku: 'BG045',
+      product: 'Silver Bangles',
+      quantity: 12,
+      costPrice: 800,
+      sellPrice: 1100,
+      profit: 300
+    },
+    {
+      date: '22/01',
+      sku: 'ER023',
+      product: 'Pearl Earrings',
+      quantity: 8,
+      costPrice: 450,
+      sellPrice: 650,
+      profit: 200
+    },
+    {
+      date: '22/01',
+      sku: 'PF012',
+      product: 'Rose Perfume',
+      quantity: 15,
+      costPrice: 200,
+      sellPrice: 350,
+      profit: 150
+    },
+    {
+      date: '21/01',
+      sku: 'RG078',
+      product: 'Diamond Ring',
+      quantity: 3,
+      costPrice: 3200,
+      sellPrice: 4500,
+      profit: 1300
+    },
+    {
+      date: '21/01',
+      sku: 'ER056',
+      product: 'Gold Earrings',
+      quantity: 7,
+      costPrice: 600,
+      sellPrice: 850,
+      profit: 250
+    },
+    {
+      date: '20/01',
+      sku: 'CH034',
+      product: 'Silver Chain',
+      quantity: 10,
+      costPrice: 300,
+      sellPrice: 480,
+      profit: 180
+    },
+    {
+      date: '20/01',
+      sku: 'PF008',
+      product: 'Lavender Perfume',
+      quantity: 20,
+      costPrice: 150,
+      sellPrice: 250,
+      profit: 100
+    }
+  ];
+
