@@ -12,11 +12,16 @@ public class Leadger {
     @ManyToOne
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private Customer customerId;
+    @Column(nullable = false)
     private Double billAmount;
-    private Double taxAmount;
-    private Double taxPercent;
-    private Double discountAmount;
-    private LocalDate billDate;
+    @Column(nullable = false)
+    private Double taxAmount=0.0;
+    @Column(nullable = false)
+    private Double taxPercent = 0.0;
+    @Column(nullable = true)
+    private Double discountAmount = 0.0;
+    @Column(nullable = false)
+    private LocalDate billDate = LocalDate.now();
     private Integer stampUser;
 
     public Leadger(Integer id, Customer customerId, Double billAmount, Double taxAmount, Double taxPercent, Double discountAmount, LocalDate billDate, Integer stampUser) {

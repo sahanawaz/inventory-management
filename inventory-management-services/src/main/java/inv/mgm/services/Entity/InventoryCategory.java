@@ -21,7 +21,8 @@ public class InventoryCategory {
     @JoinColumn(name = "dimension", referencedColumnName = "id")
     private SysOption dimension;
     private Integer stampUser;
-    private LocalDate stampDate;
+    @Column(nullable = false)
+    private LocalDate stampDate = LocalDate.now();
 //    @OneToOne(fetch = FetchType.LAZY)
 //    private List<InventoryInfo> inventoryInfoList;
 

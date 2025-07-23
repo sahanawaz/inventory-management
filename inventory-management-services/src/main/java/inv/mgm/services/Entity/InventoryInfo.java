@@ -20,10 +20,15 @@ public class InventoryInfo {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
 //    @JsonBackReference
     private InventoryCategory categoryId;
+    @Column(nullable = false)
     private Integer purchasedQuantity;
-    private Integer soldQuantity;
+    @Column(nullable = true)
+    private Integer soldQuantity = 0;
+    @Column(nullable = false, unique = true)
     private String inventorySku;
+    @Column(nullable = false)
     private Integer stampUser;
+    @Column(nullable = false)
     private LocalDate stampDate;
 
     public InventoryInfo() {

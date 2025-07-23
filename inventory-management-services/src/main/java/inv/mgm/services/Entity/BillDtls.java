@@ -12,20 +12,32 @@ public class BillDtls {
     @ManyToOne
     @JoinColumn(name = "bill_id", referencedColumnName = "id")
     private Leadger billId;
+    @ManyToOne
+    @JoinColumn(name = "inventory_info_id", referencedColumnName = "id")
     private Integer inventoryInfoId;
+    @Column(nullable = false)
+    private String particulars;
+    @Column(nullable = false)
     private Integer quantity;
+    @Column(nullable = false)
     private Double amount;
-    private Double taxAmount;
+    @Column(nullable = true)
+    private Double taxAmount=0.0;
+    @Column(nullable = true)
     private String info;
+    @Column(nullable = false)
     private Integer stampUser;
-    private LocalDate stampDate;
+    @Column
+    private LocalDate stampDate = LocalDate.now();
+
     public BillDtls() {
         // Default constructor
     }
-    public BillDtls(Integer id, Leadger billId, Integer inventoryInfoId, Integer quantity, Double amount, Double taxAmount, String info, Integer stampUser, LocalDate stampDate) {
+    public BillDtls(Integer id, Leadger billId, Integer inventoryInfoId, String particulars, Integer quantity, Double amount, Double taxAmount, String info, Integer stampUser, LocalDate stampDate) {
         this.id = id;
         this.billId = billId;
         this.inventoryInfoId = inventoryInfoId;
+        this.particulars = particulars;
         this.quantity = quantity;
         this.amount = amount;
         this.taxAmount = taxAmount;
@@ -104,5 +116,13 @@ public class BillDtls {
 
     public void setStampDate(LocalDate stampDate) {
         this.stampDate = stampDate;
+    }
+
+    public String getParticulars() {
+        return particulars;
+    }
+
+    public void setParticulars(String particulars) {
+        this.particulars = particulars;
     }
 }

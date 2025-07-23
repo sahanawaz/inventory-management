@@ -10,7 +10,9 @@ public class Expenditure {
     @ManyToOne
     @JoinColumn(name = "expenditure_type", referencedColumnName = "id")
     private SysOption expenditureType;
+    @Column(nullable = false)
     private Double amount;
+    @Column(nullable = true)
     private String info;
     @ManyToOne
     @JoinColumn(name = "paid_by", referencedColumnName = "id")
