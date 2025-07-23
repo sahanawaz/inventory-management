@@ -1,10 +1,11 @@
 import { StyleSheet } from "react-native";
+import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
 
 export const modalStyles = StyleSheet.create({
   modalContainerStyle: {
     backgroundColor: "white",
     padding: 10,
-    margin: 30,
+    margin: 20,
     borderRadius: 8,
   },
   modalHeader: {
@@ -22,7 +23,7 @@ export const modalStyles = StyleSheet.create({
     margin: 20,
   },
   modalTitle: {
-    color: "#d4af37",
+    color: DEFAULT_THEME_COLOR,
     marginBottom: 20,
     textAlign: "center",
   },
@@ -33,7 +34,7 @@ export const modalStyles = StyleSheet.create({
   button: {
     marginHorizontal: 50,
     padding: 0,
-    backgroundColor: "#d4af37",
+    backgroundColor: DEFAULT_THEME_COLOR,
   },
   closeButton: {
     margin: 0,

@@ -40,8 +40,8 @@ const AddSkuModal: React.FC<SkuProps> = ({
     let newBillObj = { ...initBillObj };
     newBillObj.sku = skuObj.sku;
     newBillObj.qty = skuObj.qty;
-    newBillObj.unit_cp = 10.98;
-    newBillObj.unit_sp = 12.98;
+    newBillObj.unitCp = 10.98;
+    newBillObj.unitSp = 12.98;
     handleAddSKU(newBillObj);
     onHide();
   };

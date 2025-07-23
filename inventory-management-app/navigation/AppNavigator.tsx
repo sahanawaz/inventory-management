@@ -6,6 +6,7 @@ import InventoryScreen from "../components/InventoryScreen";
 import { RootStackParamList } from "../shared/SharedConstants";
 import GradientBackground from "../utils/GradientBackground";
 import { Platform, View } from "react-native";
+import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -21,11 +22,11 @@ const AppNavigator = () => {
             elevation: 0,
           },
           headerTitleStyle: {
-            color: "#d4af37",
+            color: DEFAULT_THEME_COLOR,
             fontSize: 20,
             fontFamily: Platform.OS === "ios" ? "Georgia" : "serif",
           },
-          headerTintColor: "#d4af37",
+          headerTintColor: DEFAULT_THEME_COLOR,
           headerBackground: () => (
             <GradientBackground>
               <View style={{ flex: 1 }} />

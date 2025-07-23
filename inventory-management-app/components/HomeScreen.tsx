@@ -22,6 +22,7 @@ import {
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Card, Text } from "react-native-paper";
 import GradientBackground from "../utils/GradientBackground";
+import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
 
 type HomeScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "Home">;
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontFamily: "PlayfairDisplay-Regular",
     fontSize: 24,
-    color: "#d4af37",
+    color: DEFAULT_THEME_COLOR,
     marginBottom: 4,
   },
   headerSubtitle: {
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontFamily: "PlayfairDisplay-Regular",
-    color: "#d4af37",
+    color: DEFAULT_THEME_COLOR,
     fontSize: 18,
     textAlign: "center",
     marginBottom: 16,

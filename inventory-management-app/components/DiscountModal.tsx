@@ -10,6 +10,7 @@ import {
 } from "react-native-paper";
 import { modalStyles } from "../shared/SharedStyles";
 import { StyleSheet, View } from "react-native";
+import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
 
 interface DiscountProps {
   visible: boolean;
@@ -107,11 +108,11 @@ const styles = StyleSheet.create({
     color: "#4d4d4d",
   },
   amountValue: {
-    color: "#d4af37",
+    color: DEFAULT_THEME_COLOR,
     fontWeight: "bold",
   },
   chip: {
-    fontSize: 12,
+    fontSize: 11,
   },
 });
 

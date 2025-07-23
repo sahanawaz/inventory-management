@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Button, Card, Icon, Text } from "react-native-paper";
-import { BillClass, CustBillClass } from "../shared/SharedConstants";
+import {
+  AlertModalConfig,
+  BillClass,
+  CustBillClass,
+} from "../shared/SharedConstants";
 import { Double } from "react-native/Libraries/Types/CodegenTypes";
-import { inventoryItems } from "../utils/SysData";
 import GradientBackground from "../utils/GradientBackground";
-import TextField from "./TextField";
-import { initBillObj } from "../utils/SysConsts";
+import TextField from "../utils/TextField";
+import { DEFAULT_THEME_COLOR, initlAlertConfig } from "../utils/SysConsts";
 import AddSkuModal from "./AddSkuModal";
 import DiscountModal from "./DiscountModal";
+import AlertModal from "../utils/AlertModal";
 
 const initCustBillObj = {
   customer: {
@@ -29,25 +33,32 @@ const initDiscountObj = {
 };
 
 const BillingScreen: React.FC = () => {
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<AlertModalConfig>(
+    JSON.parse(JSON.stringify(initlAlertConfig))
+  );
+  const [billObj, setBiillObj] = useState<CustBillClass>(
+    JSON.parse(JSON.stringify(initCustBillObj))
+  );
   const [appliedDiscount, setAppliedDiscount] = useState(
-    Object.assign({}, initDiscountObj)
+    JSON.parse(JSON.stringify(initDiscountObj))
   );
 
   const showModal = () => setVisible(true);
   const hideModal = () => {
     setVisible(false);
   };
+
+  useEffect(() => {
+    setBiillObj(JSON.parse(JSON.stringify(initCustBillObj)));
+  }, []);
+
   const handleAddSKU = (argBillObj: BillClass) => {
     let copyBillArr = [...billObj.billArr];
     argBillObj.invInfoId = copyBillArr.length + 1;
     copyBillArr.push(argBillObj);
     setBiillObj({ ...billObj, billArr: [...copyBillArr] });
   };
-
-  const [billObj, setBiillObj] = useState<CustBillClass>(
-    Object.assign({}, initCustBillObj)
-  );
 
   const onChangeHandler = (pkey: string, skey: string, value: any) => {
     if (!!pkey && !!skey) {
@@ -60,13 +71,13 @@ const BillingScreen: React.FC = () => {
   };
 
   // Calculate total selling price
-  const calculateTotalSP = (qty: number, unit_sp: Double) => {
-    return (qty * unit_sp).toFixed(2);
+  const calculateTotalSP = (qty: number, unitSp: Double) => {
+    return (qty * unitSp).toFixed(2);
   };
 
   const calculateFinalSP = (argBill = billObj.billArr) => {
     return argBill
-      .reduce((acc, curr) => acc + curr.qty * curr.unit_sp, 0)
+      .reduce((acc, curr) => acc + curr.qty * curr.unitSp, 0)
       .toFixed(2);
   };
 
@@ -87,27 +98,73 @@ const BillingScreen: React.FC = () => {
     });
   };
 
+  const openAlert = (
+    argMsg: string[],
+    argIsSuc: number,
+    argIconSrc: string
+  ) => {
+    setAlertConfig({
+      visible: true,
+      message: argMsg,
+      isSuccess: argIsSuc,
+      iconSrc: argIconSrc,
+    });
+  };
+
+  const closeAlert = () => {
+    setAlertConfig({
+      visible: false,
+      message: [],
+      isSuccess: 9,
+      iconSrc: "",
+    });
+  };
+
+  const isDataValid = () => {
+    let errArr = [];
+    if ([null, undefined, ""].includes(billObj.customer.name)) {
+      errArr.push("Please add customer name");
+    }
+    if ([null, undefined, ""].includes(billObj.customer.phone)) {
+      errArr.push("Please add customer phone");
+    }
+    if (billObj.billArr.length <= 0) {
+      errArr.push("Please add an item");
+    }
+
+    if (errArr.length > 0) {
+      openAlert(errArr, -1, "");
+      return false;
+    } else {
+      return true;
+    }
+  };
+
   const processBill = () => {
-    billObj.discount = appliedDiscount.discount;
-    console.log(billObj);
+    if (isDataValid()) {
+      billObj.discount = appliedDiscount.discount;
+      console.log(billObj);
+    }
   };
 
   return (
     <GradientBackground style={styles.container}>
       {/* <ScrollView contentContainerStyle={styles.container}> */}
+
       <TextField
         label={
           <Text style={styles.sectionTitle} variant="titleMedium">
-            Customer Name
+            Customer Name *
           </Text>
         }
         value={billObj?.customer?.name?.toString()}
         onChangeHandler={(v: any) => onChangeHandler("customer", "name", v)}
       />
+
       <TextField
         label={
           <Text style={styles.sectionTitle} variant="titleMedium">
-            Phone No.
+            Phone No. *
           </Text>
         }
         value={billObj?.customer?.phone?.toString()}
@@ -154,9 +211,9 @@ const BillingScreen: React.FC = () => {
               {/* Values Row */}
               <View style={styles.valuesRow}>
                 <Text style={styles.valueText}>{product.qty}</Text>
-                <Text style={styles.valueText}>₹{product.unit_sp}</Text>
+                <Text style={styles.valueText}>₹{product.unitSp}</Text>
                 <Text style={styles.valueText}>
-                  ₹{calculateTotalSP(product.qty, product.unit_sp)}
+                  ₹{calculateTotalSP(product.qty, product.unitSp)}
                 </Text>
               </View>
             </Card.Content>
@@ -177,7 +234,7 @@ const BillingScreen: React.FC = () => {
         }
         handleOnSubmit={handleDiscount}
       />
-
+      <AlertModal config={alertConfig} onDismiss={closeAlert} />
       {/* Combined Discount Button and Totals Row */}
       <View style={styles.discountTotalRow}>
         <View style={styles.totalContainer}>
@@ -225,8 +282,6 @@ const BillingScreen: React.FC = () => {
       >
         Process Bill
       </Button>
-
-      {/* </ScrollView> */}
     </GradientBackground>
   );
 };
@@ -245,7 +300,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   sectionTitle: {
-    color: "#d4af37",
+    color: DEFAULT_THEME_COLOR,
     marginBottom: 12,
   },
   sectionHeader: {
@@ -256,7 +311,7 @@ const styles = StyleSheet.create({
   },
 
   addButton: {
-    backgroundColor: "#d4af37",
+    backgroundColor: DEFAULT_THEME_COLOR,
     borderRadius: 4,
   },
 
@@ -284,7 +339,7 @@ const styles = StyleSheet.create({
   // },
   checkoutButton: {
     marginTop: 5,
-    backgroundColor: "#d4af37",
+    backgroundColor: DEFAULT_THEME_COLOR,
   },
   buttonLabel: {
     color: "#000000",
@@ -303,7 +358,7 @@ const styles = StyleSheet.create({
   skuText: {
     margin: 0,
     padding: 0,
-    color: "#d4af37",
+    color: DEFAULT_THEME_COLOR,
     fontWeight: "bold",
     fontSize: 16,
   },
@@ -319,7 +374,7 @@ const styles = StyleSheet.create({
   },
   headerText: {
     flex: 1,
-    color: "#d4af37",
+    color: DEFAULT_THEME_COLOR,
     fontWeight: "bold",
     fontSize: 14,
     textAlign: "center",
@@ -340,7 +395,7 @@ const styles = StyleSheet.create({
   },
   label: {
     // fontSize: 14,
-    color: "#d4af37",
+    color: DEFAULT_THEME_COLOR,
   },
   value: {
     fontSize: 14,
@@ -362,12 +417,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   discountButton: {
-    borderColor: "#d4af37",
+    borderColor: DEFAULT_THEME_COLOR,
     height: 40,
     justifyContent: "center",
   },
   discountButtonLabel: {
-    color: "#d4af37",
+    color: DEFAULT_THEME_COLOR,
   },
   totalRow: {
     flexDirection: "row",
@@ -392,9 +447,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   grandTotalValue: {
-    color: "#d4af37",
+    color: DEFAULT_THEME_COLOR,
     fontSize: 16,
     fontWeight: "bold",
+  },
+  validationText: {
+    color: "#ff5252",
+    fontSize: 12,
+    marginLeft: 4,
   },
 });
 
