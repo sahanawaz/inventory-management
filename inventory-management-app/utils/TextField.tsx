@@ -1,5 +1,6 @@
 import React from "react";
 import { TextInput } from "react-native-paper";
+import { DEFAULT_THEME_COLOR } from "./SysConsts";
 
 interface TxtProp {
   styles?: any;
@@ -22,7 +23,7 @@ const DEFAULT_STYLES = {
     backgroundColor: "rgba(255,255,255,0.1)",
   },
   textColor: "#ffffff",
-  placeholderTextColor: "#d4af37",
+  placeholderTextColor: DEFAULT_THEME_COLOR,
 };
 const DEFAULT_KEYBOARD_TYPE = "name-phone-pad";
 

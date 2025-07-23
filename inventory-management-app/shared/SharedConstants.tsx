@@ -10,8 +10,8 @@ export interface BillClass {
   particular: string;
   amt: number;
   qty: number;
-  unit_cp: number;
-  unit_sp: number;
+  unitCp: number;
+  unitSp: number;
   [key: string]: any;
 }
 
@@ -41,6 +41,13 @@ export type InventoryItem = {
   id: number;
   sku: string;
   qty: number;
-  unit_cp: number; // Unit Cost Price
-  unit_sp: number; // Unit Sale Price
+  unitCp: number; // Unit Cost Price
+  unitSp: number; // Unit Sale Price
 };
+
+export interface AlertModalConfig {
+  visible: boolean;
+  message: string[];
+  isSuccess: number;
+  iconSrc: string;
+}
