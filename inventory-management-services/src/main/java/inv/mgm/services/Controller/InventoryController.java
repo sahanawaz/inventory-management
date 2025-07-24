@@ -2,6 +2,7 @@ package inv.mgm.services.Controller;
 
 import inv.mgm.services.Entity.Inventory;
 import inv.mgm.services.Entity.InventoryInfo;
+import inv.mgm.services.Model.StockDataModel;
 import inv.mgm.services.Model.StocksModel;
 import inv.mgm.services.Service.InventoryService;
 import org.slf4j.Logger;
@@ -39,9 +40,9 @@ public class InventoryController {
         }
 
     @GetMapping("/getStockBySku")
-    public ResponseEntity<List<InventoryInfo>> getStockBySku(@RequestParam String sku) {
+    public ResponseEntity<List<StockDataModel>> getStockBySku(@RequestParam String sku) {
         try {
-            List<InventoryInfo> stocks = inventoryService.getStockBySku(sku);
+            List<StockDataModel> stocks = inventoryService.getStockBySku(sku);
             return ResponseEntity.ok(stocks);
         } catch (Exception e) {
             logger.error("Error fetching stocks", e);

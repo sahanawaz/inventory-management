@@ -2,97 +2,97 @@ package inv.mgm.services.Model;
 
 import inv.mgm.services.Entity.Customer;
 
+import javax.swing.*;
+import java.util.SplittableRandom;
+
 public class CustomerBillModel {
-    private Customer customer;
-    private String billDate;
-    private Double billAmount;
-    private Double taxAmount;
-    private Double taxPercent;
-    private Double discountAmount;
-    private Integer stampUser;
-    private Integer quantity;
-    private String info;
+    private String name;
+    private String address;
+    private String phone;
+    private String email;
+    private String city;
+    private String state;
+    private String postCode;
 
-    public CustomerBillModel(Customer customer, String billDate, Double billAmount, Double taxAmount, Double taxPercent, Double discountAmount, Integer stampUser, Integer quantity, String info) {
-        this.customer = customer;
-        this.billDate = billDate;
-        this.billAmount = billAmount;
-        this.taxAmount = taxAmount;
-        this.taxPercent = taxPercent;
-        this.discountAmount = discountAmount;
-        this.stampUser = stampUser;
-        this.quantity = quantity;
-        this.info = info;
+    public CustomerBillModel(String name, String address, String phone, String email, String city, String state, String postCode) {
+        this.name = name;
+        this.address = address;
+        this.phone = phone;
+        this.email = email;
+        this.city = city;
+        this.state = state;
+        this.postCode = postCode;
     }
-    public Customer getCustomer() {
-        return customer;
+    public CustomerBillModel() {
+        // Default constructor
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public String getName() {
+        return name;
     }
 
-    public String getBillDate() {
-        return billDate;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setBillDate(String billDate) {
-        this.billDate = billDate;
+    public String getAddress() {
+        return address;
     }
 
-    public Double getBillAmount() {
-        return billAmount;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public void setBillAmount(Double billAmount) {
-        this.billAmount = billAmount;
+    public String getPhone() {
+        return phone;
     }
 
-    public Double getTaxAmount() {
-        return taxAmount;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
-    public void setTaxAmount(Double taxAmount) {
-        this.taxAmount = taxAmount;
+    public String getEmail() {
+        return email;
     }
 
-    public Double getTaxPercent() {
-        return taxPercent;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public void setTaxPercent(Double taxPercent) {
-        this.taxPercent = taxPercent;
+    public String getCity() {
+        return city;
     }
 
-    public Double getDiscountAmount() {
-        return discountAmount;
+    public void setCity(String city) {
+        this.city = city;
     }
 
-    public void setDiscountAmount(Double discountAmount) {
-        this.discountAmount = discountAmount;
+    public String getState() {
+        return state;
     }
 
-    public Integer getStampUser() {
-        return stampUser;
+    public void setState(String state) {
+        this.state = state;
     }
 
-    public void setStampUser(Integer stampUser) {
-        this.stampUser = stampUser;
+    public String getPostCode() {
+        return postCode;
     }
 
-    public Integer getQuantity() {
-        return quantity;
+    public void setPostCode(String postCode) {
+        this.postCode = postCode;
     }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
 
-    public String getInfo() {
-        return info;
-    }
-
-    public void setInfo(String info) {
-        this.info = info;
+    public String jsonString() {
+        return "{" +
+                "name:'" + name + '\'' +
+                ", address:'" + address + '\'' +
+                ", phone:'" + phone + '\'' +
+                ", email:'" + email + '\'' +
+                ", city:'" + city + '\'' +
+                ", state:'" + state + '\'' +
+                ", postCode:'" + postCode + '\'' +
+                '}';
     }
 }

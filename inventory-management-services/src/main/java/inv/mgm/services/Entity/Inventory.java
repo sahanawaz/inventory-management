@@ -106,6 +106,8 @@ public class Inventory {
         this.inventoryType = inventoryType;
     }
 
+
+
     //    public List<InventoryInfo> getInventoryInfoList() {
 //        return inventoryInfoList;
 //    }
