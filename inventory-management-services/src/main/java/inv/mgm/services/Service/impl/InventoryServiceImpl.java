@@ -1,14 +1,15 @@
-package inv.mgm.services.Service;
+package inv.mgm.services.Service.impl;
 import inv.mgm.services.Entity.InventoryInfo;
 import inv.mgm.services.Model.StockDataModel;
 import inv.mgm.services.Repository.InventoryRepository;
+import inv.mgm.services.Service.InventoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class InventoryServiceImpl implements InventoryService{
+public class InventoryServiceImpl implements InventoryService {
     @Autowired
     InventoryRepository inventoryRepository;
     /**

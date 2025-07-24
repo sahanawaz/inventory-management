@@ -39,13 +39,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     productsOut: 12,
   };
 
-  useEffect(() => {
-    const func = async () => {
-      const dummyJsonResp = await CallApiGet("posts/1");
-      console.log(dummyJsonResp);
-    };
-    func();
-  }, []);
   return (
     <GradientBackground>
       <SafeAreaView style={styles.safeArea}>
