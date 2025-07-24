@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -17,6 +17,7 @@ import TextField, {
   DEFAULT_THEME_TXT,
 } from "../utils/TextField";
 import { textFieldStyles } from "../shared/SharedStyles";
+import { CallApiGet, CallApiPost } from "../utils/ServiceHelper";
 
 type FormData = {
   categoryType: number;
@@ -43,8 +44,20 @@ const InventoryScreen = () => {
     date: new Date(),
   });
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const func = async () => {
+      const optResp = await CallApiPost("options", [
+        "COLOR",
+        "DIMENSION",
+        "CATEGORY_TYPE",
+        "INVENTORY_TYPE",
+      ]);
+
+      console.log(optResp);
+    };
+    func();
+  }, []);
 
   const handleChange = (field: string, value: number | Date) => {
     setFormData({ ...formData, [field]: value });

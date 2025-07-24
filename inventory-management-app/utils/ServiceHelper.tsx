@@ -2,20 +2,19 @@ import axios from "axios";
 import { getPersonalId, getSessionInfo, getUserInfo } from "./AuthUtils";
 import { ENV_VAR } from "./EnvVariables";
 
-const BASE_URL = ENV_VAR.API_URI;
-export default BASE_URL;
+export const BASE_URL = ENV_VAR.API_URI;
 
-axios.interceptors.request.use(
-  (config) => {
-    config.headers["sessionId"] = getSessionInfo();
-    config.headers["userId"] = getUserInfo("userId");
-    config.headers["personalId"] = getPersonalId();
-    return config;
-  },
-  (error) => {
-    Promise.reject(error);
-  }
-);
+// axios.interceptors.request.use(
+//   (config) => {
+//     config.headers["sessionId"] = getSessionInfo();
+//     config.headers["userId"] = getUserInfo("userId");
+//     config.headers["personalId"] = getPersonalId();
+//     return config;
+//   },
+//   (error) => {
+//     Promise.reject(error);
+//   }
+// );
 
 export async function CallApiGet(argApiName: string) {
   try {
@@ -34,6 +33,11 @@ export async function CallApiGet(argApiName: string) {
 export async function CallApiPost(argApiName: string, argData: any) {
   try {
     //======== Call API POST =========
+    console.log(
+      "======== Call API POST =========",
+      ENV_VAR.API_URI + "/" + argApiName,
+      argData
+    );
     const apiUrl = ENV_VAR.API_URI + "/" + argApiName;
     const resp = await axios.post(apiUrl, argData);
     PostApiCallHandler(resp.data);
@@ -115,6 +119,7 @@ export async function CallApiGetWithHead(argApiName: string) {
 export async function CallApiPostWithHead(argApiName: string, argData: any) {
   try {
     //======== Call API POST =========
+    console.log("======== Call API POST =========", ENV_VAR.API_URI);
     const apiUrl = ENV_VAR.API_URI + "/" + argApiName;
     const resp = await axios.post(apiUrl, argData, { responseType: "blob" });
     PostApiCallHandler(resp);
