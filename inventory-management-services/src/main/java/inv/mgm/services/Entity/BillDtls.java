@@ -14,7 +14,7 @@ public class BillDtls {
     private Leadger billId;
     @ManyToOne
     @JoinColumn(name = "inventory_info_id", referencedColumnName = "id")
-    private Integer inventoryInfoId;
+    private InventoryInfo inventoryInfoId;
     @Column(nullable = false)
     private String particulars;
     @Column(nullable = false)
@@ -33,7 +33,7 @@ public class BillDtls {
     public BillDtls() {
         // Default constructor
     }
-    public BillDtls(Integer id, Leadger billId, Integer inventoryInfoId, String particulars, Integer quantity, Double amount, Double taxAmount, String info, Integer stampUser, LocalDate stampDate) {
+    public BillDtls(Integer id, Leadger billId, InventoryInfo inventoryInfoId, String particulars, Integer quantity, Double amount, Double taxAmount, String info, Integer stampUser, LocalDate stampDate) {
         this.id = id;
         this.billId = billId;
         this.inventoryInfoId = inventoryInfoId;
@@ -62,11 +62,11 @@ public class BillDtls {
         this.billId = billId;
     }
 
-    public Integer getInventoryInfoId() {
+    public InventoryInfo getInventoryInfoId() {
         return inventoryInfoId;
     }
 
-    public void setInventoryInfoId(Integer inventoryInfoId) {
+    public void setInventoryInfoId(InventoryInfo inventoryInfoId) {
         this.inventoryInfoId = inventoryInfoId;
     }
 

@@ -1,6 +1,7 @@
 package inv.mgm.services.Controller;
 
 import inv.mgm.services.Model.CustomerBillModel;
+import inv.mgm.services.Model.SalesBillModel;
 import inv.mgm.services.Service.BillingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +18,10 @@ public class BillingController {
     BillingService billingService;
 
     @PostMapping("/createBill")
-        public ResponseEntity<String> createBill(@RequestBody CustomerBillModel customerBill) {
+        public ResponseEntity<String> createBill(@RequestBody SalesBillModel billModel) {
             try {
-                logger.info("Received bill for customer: {}", customerBill.getCustomer().getName());
-                billingService.processBill(customerBill);
+                logger.info("Received bill for customer: {}", billModel.getCustomer().getName());
+                billingService.processBill(billModel);
                 return ResponseEntity.ok("Bill processed successfully");
             } catch (Exception e) {
                 logger.error("Error processing bill: ", e);
