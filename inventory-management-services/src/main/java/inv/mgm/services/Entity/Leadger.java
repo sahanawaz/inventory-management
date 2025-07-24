@@ -3,26 +3,39 @@ package inv.mgm.services.Entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 public class Leadger {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private Customer customerId;
+
     @Column(nullable = false)
     private Double billAmount;
+
     @Column(nullable = false)
     private Double taxAmount=0.0;
+
     @Column(nullable = false)
     private Double taxPercent = 0.0;
+
     @Column(nullable = true)
     private Double discountAmount = 0.0;
+
     @Column(nullable = false)
     private LocalDate billDate = LocalDate.now();
+
     private Integer stampUser;
+
+    @OneToMany(mappedBy = "billId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<BillDtls> billItems;
+
+
 
     public Leadger(Integer id, Customer customerId, Double billAmount, Double taxAmount, Double taxPercent, Double discountAmount, LocalDate billDate, Integer stampUser) {
         this.id = id;
@@ -100,5 +113,13 @@ public class Leadger {
 
     public void setStampUser(Integer stampUser) {
         this.stampUser = stampUser;
+    }
+
+    public List<BillDtls> getBillItems() {
+        return billItems;
+    }
+
+    public void setBillItems(List<BillDtls> billItems) {
+        this.billItems = billItems;
     }
 }

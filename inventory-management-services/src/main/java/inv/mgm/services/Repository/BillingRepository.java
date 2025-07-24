@@ -15,9 +15,9 @@ public interface BillingRepository extends JpaRepository<Leadger, Long> {
     // List<Billing> findByBillingDate(Date billingDate);
     // List<Billing> findByCustomerId(Long customerId);
     // Inherited from JpaRepository: List<BillingRepository> findAll();
-    @Transactional // Ensure transactional context for modification
-    @Query(value = "select * from saveBill(:billModel)", nativeQuery = true)
-    int createBill(@Param("billModel") String billModel);
+//    @Transactional // Ensure transactional context for modification
+//    @Query(value = "select * from saveBill(:billModel)", nativeQuery = true)
+//    int createBill(@Param("billModel") String billModel);
 
 
 

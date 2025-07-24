@@ -1,5 +1,6 @@
 package inv.mgm.services.Controller;
 
+import inv.mgm.services.Entity.Leadger;
 import inv.mgm.services.Model.CustomerBillModel;
 import inv.mgm.services.Model.SalesBillModel;
 import inv.mgm.services.Service.BillingService;
@@ -21,7 +22,7 @@ public class BillingController {
         public ResponseEntity<String> createBill(@RequestBody SalesBillModel billModel) {
             try {
                 logger.info("Received bill for customer: {}", billModel.getCustomer().getName());
-                billingService.processBill(billModel);
+                Leadger ledg = billingService.processBill(billModel);
                 return ResponseEntity.ok("Bill processed successfully");
             } catch (Exception e) {
                 logger.error("Error processing bill: ", e);
