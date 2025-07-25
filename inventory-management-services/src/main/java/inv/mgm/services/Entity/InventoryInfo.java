@@ -10,7 +10,7 @@ import java.time.LocalDate;
 public class InventoryInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inventory_id", referencedColumnName = "id")

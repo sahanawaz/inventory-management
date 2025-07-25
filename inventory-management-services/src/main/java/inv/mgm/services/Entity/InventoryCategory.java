@@ -9,7 +9,7 @@ import java.util.List;
 public class InventoryCategory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne
     @JoinColumn(name = "category_type", referencedColumnName = "id")

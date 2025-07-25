@@ -7,26 +7,35 @@ import java.time.LocalDate;
 @Entity
 public class BillDtls {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "bill_id", referencedColumnName = "id")
     private Leadger billId;
+
     @ManyToOne
     @JoinColumn(name = "inventory_info_id", referencedColumnName = "id")
     private InventoryInfo inventoryInfoId;
+
     @Column(nullable = false)
     private String particulars;
+
     @Column(nullable = false)
     private Integer quantity;
+
     @Column(nullable = false)
     private Double amount;
+
     @Column(nullable = true)
     private Double taxAmount=0.0;
+
     @Column(nullable = true)
     private String info;
+
     @Column(nullable = false)
     private Integer stampUser;
+
     @Column
     private LocalDate stampDate = LocalDate.now();
 

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 @Entity
 public class Expenditure {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne
     @JoinColumn(name = "expenditure_type", referencedColumnName = "id")
