@@ -1,10 +1,9 @@
 package inv.mgm.services.Controller;
 
-import inv.mgm.services.Entity.Inventory;
-import inv.mgm.services.Entity.InventoryInfo;
+import inv.mgm.services.Model.GenericResponse;
 import inv.mgm.services.Model.StockDataModel;
-import inv.mgm.services.Model.StocksModel;
 import inv.mgm.services.Service.InventoryService;
+import inv.mgm.services.utils.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,24 +30,36 @@ public class InventoryController {
          * @return a list of all inventory stocks
          */
     @GetMapping("/getStocks")
-        public ResponseEntity<List<InventoryInfo>> getAllStocks() {
+        public ResponseEntity<GenericResponse> getAllStocks() {
             try {
-                List<InventoryInfo> stocks = inventoryService.getAllStocks();
-                return ResponseEntity.ok(stocks);
+                return ResponseEntity.ok(GenericResponse.builder()
+                                .respCode(HttpStatus.OK.value())
+                                .respMesaage("SUC")
+                                .respData(inventoryService.getAllStocks())
+                        .build());
             } catch (Exception e) {
                 logger.error("Error fetching stocks", e);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+                return ResponseEntity.ok(GenericResponse.builder()
+                                .respCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                                .respMesaage(Constants.SYS_ERR_MSG)
+                        .build());
             }
         }
 
     @GetMapping("/getStockBySku")
-    public ResponseEntity<List<StockDataModel>> getStockBySku(@RequestParam String sku) {
+    public ResponseEntity<GenericResponse> getStockBySku(@RequestParam String sku) {
         try {
-            List<StockDataModel> stocks = inventoryService.getStockBySku(sku);
-            return ResponseEntity.ok(stocks);
+            return ResponseEntity.ok(GenericResponse.builder()
+                            .respCode(HttpStatus.OK.value())
+                            .respMesaage("SUC")
+                            .respData(inventoryService.getStockBySku(sku))
+                    .build());
         } catch (Exception e) {
             logger.error("Error fetching stocks", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.emptyList());
+            return ResponseEntity.ok(GenericResponse.builder()
+                            .respCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .respMesaage(Constants.SYS_ERR_MSG)
+                    .build());
         }
     }
 }

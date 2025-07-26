@@ -1,7 +1,7 @@
 import * as React from "react";
-import { Modal, Portal, Text, Icon } from "react-native-paper";
+import { Modal, Portal, Text, Icon, Button } from "react-native-paper";
 import { modalStyles } from "../shared/SharedStyles";
-import { COLOR } from "./SysConsts";
+import { COLOR, DEFAULT_THEME_COLOR } from "./SysConsts";
 import { StyleSheet, View } from "react-native";
 import { AlertModalConfig } from "../shared/SharedConstants";
 
@@ -14,10 +14,11 @@ const DEFAULT_SUC_ICON = (
 
 interface AlertModalProps {
   onDismiss(): void;
+  onOk?: () => void;
   config: AlertModalConfig;
 }
 
-const AlertModal: React.FC<AlertModalProps> = ({ config, onDismiss }) => {
+const AlertModal: React.FC<AlertModalProps> = ({ config, onDismiss, onOk }) => {
   const getIcon = () => {
     switch (config?.isSuccess) {
       case 0:
@@ -31,11 +32,18 @@ const AlertModal: React.FC<AlertModalProps> = ({ config, onDismiss }) => {
     }
   };
 
+  const handleOk = () => {
+    if (!!onOk) {
+      onOk();
+    }
+    onDismiss();
+  };
+
   return (
     <Portal>
       <Modal
         visible={config?.visible}
-        onDismiss={onDismiss}
+        // onDismiss={onDismiss}
         contentContainerStyle={modalStyles.modalContainer}
       >
         <View style={modalStyles.modalContainerStyle}>
@@ -46,6 +54,17 @@ const AlertModal: React.FC<AlertModalProps> = ({ config, onDismiss }) => {
                 {msg}
               </Text>
             ))}
+          </View>
+          <View style={styles.btnContainer}>
+            <Button
+              mode="contained"
+              style={styles.button}
+              buttonColor={DEFAULT_THEME_COLOR}
+              labelStyle={styles.btnLabel}
+              onPress={config.isSuccess === 0 ? handleOk : onDismiss}
+            >
+              {config.isSuccess === 0 ? "OK" : "Cancel"}
+            </Button>
           </View>
         </View>
         {/* React Native Paper Icon Component */}
@@ -67,6 +86,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+  },
+  btnContainer: {
+    flexDirection: "row",
+    display: "flex",
+    alignContent: "center",
+    justifyContent: "center",
+  },
+  button: {
+    width: 100,
+    height: 40,
+    marginTop: 10,
+  },
+  btnLabel: {
+    padding: 0,
   },
 });
 

@@ -1,5 +1,6 @@
 package inv.mgm.services.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ public class Inventory {
     @Column(nullable = false)
     private LocalDate stampDate = LocalDate.now();
     private String inventoryDesc;
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inventory_type", referencedColumnName = "id")
     private SysOption inventoryType;

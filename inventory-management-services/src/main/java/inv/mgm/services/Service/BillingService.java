@@ -1,11 +1,13 @@
 package inv.mgm.services.Service;
 
-import inv.mgm.services.Entity.Leadger;
-import inv.mgm.services.Model.CustomerBillModel;
+import inv.mgm.services.Entity.Ledger;
 import inv.mgm.services.Model.SalesBillModel;
-import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
 
 
 public interface BillingService {
-    Leadger processBill(SalesBillModel billModel);
+    Ledger processBill(SalesBillModel billModel);
+    List<Ledger> findAllBillsBetweenDateRange(LocalDate startDt, LocalDate endDt);
 }

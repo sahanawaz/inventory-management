@@ -23,4 +23,20 @@ export const COLOR = {
 };
 export const ERR_MSG = {
   REQ: "This Field is required!!",
+  E500: "Oops! Something went wrong. Please try after sometime!!",
 };
+
+export const months = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];

@@ -49,6 +49,19 @@ export type InventoryItem = {
 export interface AlertModalConfig {
   visible: boolean;
   message: string[];
-  isSuccess: number;
+  isSuccess: -1 | 0 | 1;
   iconSrc: string;
+}
+
+export interface SysOpt {
+  key: number;
+  value: string;
+  code: string;
+}
+
+export interface DropdownOpts {
+  catTypeOpts: SysOpt[];
+  invTypeOpts: SysOpt[];
+  colorOpts: SysOpt[];
+  dimensionOpts: SysOpt[];
 }

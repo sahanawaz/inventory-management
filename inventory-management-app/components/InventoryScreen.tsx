@@ -5,10 +5,15 @@ import {
   ScrollView,
   TextInput as RNTextInput,
 } from "react-native";
-import { Text, Button, useTheme, TextInput } from "react-native-paper";
+import {
+  Text,
+  Button,
+  useTheme,
+  TextInput,
+  ActivityIndicator,
+} from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { dropdownOptions } from "../utils/SysData";
 import GradientBackground from "../utils/GradientBackground";
 import { SelectList } from "react-native-dropdown-select-list";
 import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
@@ -18,6 +23,9 @@ import TextField, {
 } from "../utils/TextField";
 import { textFieldStyles } from "../shared/SharedStyles";
 import { CallApiGet, CallApiPost } from "../utils/ServiceHelper";
+import { DropdownOpts } from "../shared/SharedConstants";
+import useAlertModal from "../helper/useAlertModal";
+import useLoader from "../helper/useLoader";
 
 type FormData = {
   categoryType: number;
@@ -32,6 +40,13 @@ type FormData = {
 
 type FormDataKeys = keyof FormData;
 
+const initDropdownOpts = {
+  catTypeOpts: [],
+  invTypeOpts: [],
+  colorOpts: [],
+  dimensionOpts: [],
+};
+
 const InventoryScreen = () => {
   const [formData, setFormData] = useState<FormData>({
     categoryType: 0,
@@ -44,20 +59,69 @@ const InventoryScreen = () => {
     date: new Date(),
   });
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dropdownOpts, setDropdownOpts] = useState<DropdownOpts>(
+    JSON.parse(JSON.stringify(initDropdownOpts))
+  );
+  const { showModal, Modal } = useAlertModal();
+  const { startAnimation, stopAnimation, Loader } = useLoader();
+  const [isLoaderVisible, setLoaderVisibility] = useState(false);
 
   useEffect(() => {
-    const func = async () => {
-      const optResp = await CallApiPost("options", [
-        "COLOR",
-        "DIMENSION",
-        "CATEGORY_TYPE",
-        "INVENTORY_TYPE",
-      ]);
-
-      console.log(optResp);
-    };
-    func();
+    fetchDropdownOpts();
   }, []);
+
+  const openAlert = (
+    argMsg: string[],
+    argIsSuc: -1 | 0 | 1,
+    argIconSrc: string,
+    callback: () => void
+  ) => {
+    showModal(
+      {
+        visible: true,
+        message: argMsg,
+        isSuccess: argIsSuc,
+        iconSrc: argIconSrc,
+      },
+      callback
+    );
+  };
+
+  const fetchDropdownOpts = async () => {
+    startAnimation();
+    const optResp = await CallApiPost("options", [
+      "COLOR",
+      "DIMENSION",
+      "CATEGORY_TYPE",
+      "INVENTORY_TYPE",
+    ]);
+    if (optResp.respCode === 200) {
+      setDropdownOpts({
+        catTypeOpts: optResp.respData.filter(
+          (opt: { code: string }) => opt.code === "CATEGORY_TYPE"
+        ),
+        invTypeOpts: optResp.respData.filter(
+          (opt: { code: string }) => opt.code === "INVENTORY_TYPE"
+        ),
+        colorOpts: optResp.respData.filter(
+          (opt: { code: string }) => opt.code === "COLOR"
+        ),
+        dimensionOpts: optResp.respData.filter(
+          (opt: { code: string }) => opt.code === "DIMENSION"
+        ),
+      });
+    } else {
+      openAlert(
+        [
+          "Sorry, we failed to get dropdown options. Please try after sometime!!",
+        ],
+        -1,
+        "",
+        () => {}
+      );
+    }
+    stopAnimation();
+  };
 
   const handleChange = (field: string, value: number | Date) => {
     setFormData({ ...formData, [field]: value });
@@ -100,20 +164,21 @@ const InventoryScreen = () => {
 
   return (
     <GradientBackground style={styles.container}>
+      {Loader}
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {/* Dropdowns */}
         {renderDropdown(
           "categoryType",
           "Category Type",
-          dropdownOptions.categoryType
+          dropdownOpts.catTypeOpts
         )}
         {renderDropdown(
           "inventoryType",
           "Inventory Type",
-          dropdownOptions.inventoryType
+          dropdownOpts.invTypeOpts
         )}
-        {renderDropdown("color", "Color", dropdownOptions.color)}
-        {renderDropdown("dimension", "Dimension", dropdownOptions.dimension)}
+        {renderDropdown("color", "Color", dropdownOpts.colorOpts)}
+        {renderDropdown("dimension", "Dimension", dropdownOpts.dimensionOpts)}
 
         {/* Other inputs remain the same as previous implementation */}
         {/* Weight Input */}
@@ -187,6 +252,7 @@ const InventoryScreen = () => {
           Add Inventory
         </Button>
       </ScrollView>
+      {Modal}
     </GradientBackground>
   );
 };

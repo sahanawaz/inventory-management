@@ -5,13 +5,13 @@ import java.util.List;
 public class SalesBillModel {
     private Integer id;
     private CustomerBillModel customer;
-    private List<BillModel> billItems;
+    private List<BillModel> billArr;
     private Double discount;
 
-    public SalesBillModel(Integer id, CustomerBillModel customer, List<BillModel> billItems, Double discount) {
+    public SalesBillModel(Integer id, CustomerBillModel customer, List<BillModel> billArr, Double discount) {
         this.id = id;
         this.customer = customer;
-        this.billItems = billItems;
+        this.billArr = billArr;
         this.discount = discount;
     }
 
@@ -35,12 +35,12 @@ public class SalesBillModel {
         this.customer = customer;
     }
 
-    public List<BillModel> getBillItems() {
-        return billItems;
+    public List<BillModel> getBillArr() {
+        return billArr;
     }
 
-    public void setBillItems(List<BillModel> billItems) {
-        this.billItems = billItems;
+    public void setBillArr(List<BillModel> billArr) {
+        this.billArr = billArr;
     }
 
     public Double getDiscount() {
@@ -55,7 +55,7 @@ public class SalesBillModel {
     public String jsonString() {
         return "[{" +
                 "customer:" + customer.jsonString() +
-                ", billItems:" + billItems.toString() +
+                ", billItems:" + billArr.toString() +
                 ", discount:" + discount +
                 "}]";
     }

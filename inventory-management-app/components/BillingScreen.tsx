@@ -1,19 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Button, Card, Icon, Text } from "react-native-paper";
 import {
   AlertModalConfig,
   BillClass,
   CustBillClass,
+  RootStackParamList,
 } from "../shared/SharedConstants";
 import { Double } from "react-native/Libraries/Types/CodegenTypes";
 import GradientBackground from "../utils/GradientBackground";
 import TextField from "../utils/TextField";
-import { DEFAULT_THEME_COLOR, initlAlertConfig } from "../utils/SysConsts";
+import {
+  DEFAULT_THEME_COLOR,
+  ERR_MSG,
+  initlAlertConfig,
+} from "../utils/SysConsts";
 import AddSkuModal from "./AddSkuModal";
 import DiscountModal from "./DiscountModal";
 import AlertModal from "../utils/AlertModal";
 import { textFieldStyles } from "../shared/SharedStyles";
+import { CallApiGet, CallApiPost } from "../utils/ServiceHelper";
+import useLoader from "../helper/useLoader";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { useFocusEffect } from "@react-navigation/native";
 
 const initCustBillObj = {
   customer: {
@@ -33,7 +42,14 @@ const initDiscountObj = {
   discount: 0,
 };
 
-const BillingScreen: React.FC = () => {
+type BillingScreenNavigationProp = {
+  navigation: StackNavigationProp<RootStackParamList, "Billing">;
+};
+
+const BillingScreen: React.FC<BillingScreenNavigationProp> = ({
+  navigation,
+}) => {
+  const { startAnimation, stopAnimation, Loader } = useLoader();
   const [visible, setVisible] = useState(false);
   const [alertConfig, setAlertConfig] = useState<AlertModalConfig>(
     JSON.parse(JSON.stringify(initlAlertConfig))
@@ -50,15 +66,35 @@ const BillingScreen: React.FC = () => {
     setVisible(false);
   };
 
-  useEffect(() => {
-    setBiillObj(JSON.parse(JSON.stringify(initCustBillObj)));
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      setBiillObj(JSON.parse(JSON.stringify(initCustBillObj)));
+      setAppliedDiscount(JSON.parse(JSON.stringify(initDiscountObj)));
+    }, [])
+  );
 
-  const handleAddSKU = (argBillObj: BillClass) => {
-    let copyBillArr = [...billObj.billArr];
-    argBillObj.invInfoId = copyBillArr.length + 1;
-    copyBillArr.push(argBillObj);
-    setBiillObj({ ...billObj, billArr: [...copyBillArr] });
+  const handleAddSKU = async (argBillObj: BillClass) => {
+    startAnimation();
+    const respSku = await CallApiGet(`getStockBySku?sku=${argBillObj.sku}`);
+    console.log(respSku);
+    if (respSku.respCode === 200 && respSku.respData?.length > 0) {
+      let copyBillArr = [...billObj.billArr];
+      let data = respSku.respData[0];
+      let itemIndex = copyBillArr.findIndex(
+        (prdt) => prdt.sku === argBillObj.sku
+      );
+      if (itemIndex > -1) {
+        copyBillArr[itemIndex].qty =
+          +copyBillArr[itemIndex].qty + +argBillObj.qty;
+      } else {
+        data.qty = argBillObj.qty;
+        copyBillArr.push(data);
+      }
+      setBiillObj({ ...billObj, billArr: [...copyBillArr] });
+    } else {
+      openAlert([ERR_MSG.E500], -1, "");
+    }
+    stopAnimation();
   };
 
   const onChangeHandler = (pkey: string, skey: string, value: any) => {
@@ -101,7 +137,7 @@ const BillingScreen: React.FC = () => {
 
   const openAlert = (
     argMsg: string[],
-    argIsSuc: number,
+    argIsSuc: -1 | 0 | 1,
     argIconSrc: string
   ) => {
     setAlertConfig({
@@ -116,7 +152,7 @@ const BillingScreen: React.FC = () => {
     setAlertConfig({
       visible: false,
       message: [],
-      isSuccess: 9,
+      isSuccess: 1,
       iconSrc: "",
     });
   };
@@ -141,17 +177,29 @@ const BillingScreen: React.FC = () => {
     }
   };
 
-  const processBill = () => {
+  const processBill = async () => {
     if (isDataValid()) {
       billObj.discount = appliedDiscount.discount;
-      console.log(billObj);
+      startAnimation();
+      const saveResp = await CallApiPost("createBill", billObj);
+      if (saveResp.respCode === 200) {
+        openAlert(["Thank You, Your bill has been processed."], 0, "");
+      } else {
+        openAlert(
+          [
+            "Sorry, we are not able process your bill at this moment due to some technical glitch.",
+          ],
+          -1,
+          ""
+        );
+      }
+      stopAnimation();
     }
   };
 
   return (
     <GradientBackground style={styles.container}>
-      {/* <ScrollView contentContainerStyle={styles.container}> */}
-
+      {Loader}
       <TextField
         label={
           <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
@@ -235,7 +283,11 @@ const BillingScreen: React.FC = () => {
         }
         handleOnSubmit={handleDiscount}
       />
-      <AlertModal config={alertConfig} onDismiss={closeAlert} />
+      <AlertModal
+        config={alertConfig}
+        onDismiss={closeAlert}
+        onOk={() => navigation.navigate("Ledger")}
+      />
       {/* Combined Discount Button and Totals Row */}
       <View style={styles.discountTotalRow}>
         <View style={styles.totalContainer}>

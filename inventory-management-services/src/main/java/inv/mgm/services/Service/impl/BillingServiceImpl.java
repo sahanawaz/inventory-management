@@ -3,7 +3,7 @@ package inv.mgm.services.Service.impl;
 import inv.mgm.services.Entity.BillDtls;
 import inv.mgm.services.Entity.Customer;
 import inv.mgm.services.Entity.InventoryInfo;
-import inv.mgm.services.Entity.Leadger;
+import inv.mgm.services.Entity.Ledger;
 import inv.mgm.services.Model.BillModel;
 import inv.mgm.services.Model.CustomerBillModel;
 import inv.mgm.services.Model.SalesBillModel;
@@ -32,40 +32,39 @@ public class BillingServiceImpl implements BillingService {
 
     @Override
     @Transactional
-    public Leadger processBill(SalesBillModel billModel) {
-        if (Objects.isNull(billModel)|| Objects.isNull(billModel.getBillItems()) || billModel.getBillItems().isEmpty()) {
+    public Ledger processBill(SalesBillModel billModel) {
+        if (Objects.isNull(billModel)|| Objects.isNull(billModel.getBillArr()) || billModel.getBillArr().isEmpty()) {
             throw new IllegalArgumentException("Bill model or items cannot be null or empty");
         }
-        Leadger leadger = new Leadger();
-        leadger.setId(billModel.getId());
-        leadger.setCustomerId(getCustomerData(billModel.getCustomer()));
-        leadger.setBillDate(LocalDate.now());
-        leadger.setStampUser(0);
-        leadger.setDiscountAmount(billModel.getDiscount());
-        leadger.setTaxAmount(0.0);
-        leadger.setTaxPercent(0.0);
+        Ledger ledger = new Ledger();
+        ledger.setId(billModel.getId());
+        ledger.setCustomerId(getCustomerData(billModel.getCustomer()));
+        ledger.setBillDate(LocalDate.now());
+        ledger.setStampUser(0);
+        ledger.setDiscountAmount(billModel.getDiscount());
+        ledger.setTaxAmount(0.0);
+        ledger.setTaxPercent(0.0);
         //set bill details
         double totalAmount = 0.0;
         List<BillDtls> bills = new ArrayList<>();
-        for(BillModel billItem : billModel.getBillItems()) {
+        for(BillModel billItem : billModel.getBillArr()) {
             BillDtls billDtls = new BillDtls();
             billDtls.setAmount(billItem.getAmount());
             billDtls.setInfo("");
-            billDtls.setQuantity(billItem.getQuantity());
             billDtls.setParticulars(billItem.getParticulars());
             billDtls.setStampUser(0);
             //get inventory info by SKU
             billDtls.setInventoryInfoId(getInventoryInfo(billItem.getSku()));
             billDtls.setStampDate(LocalDate.now());
-            billDtls.setQuantity(billItem.getQuantity());
+            billDtls.setQuantity(billItem.getQty());
             billDtls.setTaxAmount(0.0);
-            totalAmount += billItem.getUnitSp();
+            totalAmount += (billItem.getQty() * billItem.getUnitSp());
             bills.add(billDtls);
         }
-        leadger.setBillAmount(totalAmount);
-        leadger.setBillItems(bills);
+        ledger.setBillAmount(totalAmount - billModel.getDiscount());
+        ledger.setBillArr(bills);
 
-        return billingRepository.save(leadger);
+        return billingRepository.save(ledger);
     }
 
     Customer getCustomerData(CustomerBillModel customerBillModel) {
@@ -90,5 +89,10 @@ public class BillingServiceImpl implements BillingService {
             throw new IllegalArgumentException("Inventory item not found for SKU: " + inventorySku);
         }
         return inventoryInfos.get(0); // Assuming SKU is unique, return the first match
+    }
+
+    @Override
+    public List<Ledger> findAllBillsBetweenDateRange(LocalDate startDt, LocalDate endDt) {
+        return billingRepository.findByBillDateBetween(startDt, endDt);
     }
 }
