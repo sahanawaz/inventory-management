@@ -165,7 +165,6 @@ const LedgerScreen = () => {
           value={locDate.startDate}
           mode="date"
           display="default"
-          // design="material"
           onChange={handleStartDateChange}
           maximumDate={locDate.endDate}
         />
@@ -177,7 +176,6 @@ const LedgerScreen = () => {
           value={locDate.endDate}
           mode="date"
           display="default"
-          // design="material"
           onChange={handleEndDateChange}
           minimumDate={locDate.startDate}
           maximumDate={new Date()}

@@ -1,5 +1,6 @@
 package inv.mgm.services.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -13,18 +14,20 @@ public class InventoryCategory {
     private Integer id;
     @ManyToOne
     @JoinColumn(name = "category_type", referencedColumnName = "id")
+    @JsonManagedReference
     private SysOption categoryType;
     @ManyToOne
     @JoinColumn(name = "color", referencedColumnName = "id")
+    @JsonManagedReference
     private SysOption color;
     @ManyToOne
     @JoinColumn(name = "dimension", referencedColumnName = "id")
+    @JsonManagedReference
     private SysOption dimension;
     private Integer stampUser;
     @Column(nullable = false)
     private LocalDate stampDate = LocalDate.now();
-//    @OneToOne(fetch = FetchType.LAZY)
-//    private List<InventoryInfo> inventoryInfoList;
+
 
     public InventoryCategory() {
         // Default constructor

@@ -54,7 +54,7 @@ public class BillingServiceImpl implements BillingService {
             billDtls.setParticulars(billItem.getParticulars());
             billDtls.setStampUser(0);
             //get inventory info by SKU
-            billDtls.setInventoryInfoId(getInventoryInfo(billItem.getSku()));
+            billDtls.setInventoryInfo(getInventoryInfo(billItem.getSku()));
             billDtls.setStampDate(LocalDate.now());
             billDtls.setQuantity(billItem.getQty());
             billDtls.setTaxAmount(0.0);
