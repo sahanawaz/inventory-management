@@ -19,7 +19,7 @@ public class BillDtls {
     private Integer id;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "bill_id")
+    @JoinColumn(name = "bill_id", referencedColumnName = "id")
     @JsonBackReference
     private Ledger ledger;
 
