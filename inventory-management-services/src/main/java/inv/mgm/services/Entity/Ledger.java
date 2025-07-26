@@ -3,11 +3,17 @@ package inv.mgm.services.Entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@ToString
 public class Ledger {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,93 +41,7 @@ public class Ledger {
     private Integer stampUser;
 
     @OneToMany(mappedBy = "ledger", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<BillDtls> billArr;
 
-
-
-    public Ledger(Integer id, Customer customerId, Double billAmount, Double taxAmount, Double taxPercent, Double discountAmount, LocalDate billDate, Integer stampUser) {
-        this.id = id;
-        this.customerId = customerId;
-        this.billAmount = billAmount;
-        this.taxAmount = taxAmount;
-        this.taxPercent = taxPercent;
-        this.discountAmount = discountAmount;
-        this.billDate = billDate;
-        this.stampUser = stampUser;
-    }
-    public Ledger() {
-        // Default constructor
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Customer getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(Customer customerId) {
-        this.customerId = customerId;
-    }
-
-    public Double getBillAmount() {
-        return billAmount;
-    }
-
-    public void setBillAmount(Double billAmount) {
-        this.billAmount = billAmount;
-    }
-
-    public Double getTaxAmount() {
-        return taxAmount;
-    }
-
-    public void setTaxAmount(Double taxAmount) {
-        this.taxAmount = taxAmount;
-    }
-
-    public Double getTaxPercent() {
-        return taxPercent;
-    }
-
-    public void setTaxPercent(Double taxPercent) {
-        this.taxPercent = taxPercent;
-    }
-
-    public Double getDiscountAmount() {
-        return discountAmount;
-    }
-
-    public void setDiscountAmount(Double discountAmount) {
-        this.discountAmount = discountAmount;
-    }
-
-    public LocalDate getBillDate() {
-        return billDate;
-    }
-
-    public void setBillDate(LocalDate billDate) {
-        this.billDate = billDate;
-    }
-
-    public Integer getStampUser() {
-        return stampUser;
-    }
-
-    public void setStampUser(Integer stampUser) {
-        this.stampUser = stampUser;
-    }
-
-    public List<BillDtls> getBillArr() {
-        return billArr;
-    }
-
-    public void setBillArr(List<BillDtls> billArr) {
-        this.billArr = billArr;
-    }
 }
