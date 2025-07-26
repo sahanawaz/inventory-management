@@ -1,5 +1,6 @@
 package inv.mgm.services.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -11,11 +12,12 @@ public class BillDtls {
     private Integer id;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "bill_id", referencedColumnName = "id")
-    private Leadger billId;
+    @JoinColumn(name = "bill_id")
+    private Ledger ledger;
 
     @ManyToOne
     @JoinColumn(name = "inventory_info_id", referencedColumnName = "id")
+    @JsonBackReference
     private InventoryInfo inventoryInfoId;
 
     @Column(nullable = false)
@@ -42,9 +44,9 @@ public class BillDtls {
     public BillDtls() {
         // Default constructor
     }
-    public BillDtls(Integer id, Leadger billId, InventoryInfo inventoryInfoId, String particulars, Integer quantity, Double amount, Double taxAmount, String info, Integer stampUser, LocalDate stampDate) {
+    public BillDtls(Integer id, Ledger ledger, InventoryInfo inventoryInfoId, String particulars, Integer quantity, Double amount, Double taxAmount, String info, Integer stampUser, LocalDate stampDate) {
         this.id = id;
-        this.billId = billId;
+        this.ledger = ledger;
         this.inventoryInfoId = inventoryInfoId;
         this.particulars = particulars;
         this.quantity = quantity;
@@ -63,12 +65,12 @@ public class BillDtls {
         this.id = id;
     }
 
-    public Leadger getBillId() {
-        return billId;
+    public Ledger getLedger() {
+        return ledger;
     }
 
-    public void setBillId(Leadger billId) {
-        this.billId = billId;
+    public void setLedger(Ledger ledger) {
+        this.ledger = ledger;
     }
 
     public InventoryInfo getInventoryInfoId() {

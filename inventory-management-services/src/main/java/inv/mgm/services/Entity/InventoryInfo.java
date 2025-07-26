@@ -1,7 +1,6 @@
 package inv.mgm.services.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -14,12 +13,12 @@ public class InventoryInfo {
     private Integer id;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "inventory_id", referencedColumnName = "id")
-//    @JsonBackReference
+    @JsonBackReference
     private Inventory inventory;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", referencedColumnName = "id")
-//    @JsonBackReference
-    private InventoryCategory categoryId;
+    @JsonBackReference
+    private InventoryCategory category;
     @Column(nullable = false)
     private Integer purchasedQuantity;
     @Column(nullable = true)
@@ -34,10 +33,10 @@ public class InventoryInfo {
     public InventoryInfo() {
         // Default constructor
     }
-    public InventoryInfo(Integer id, Inventory inventory, InventoryCategory categoryId, Integer purchasedQuantity, Integer soldQuantity, String inventorySku, Integer stampUser, LocalDate stampDate) {
+    public InventoryInfo(Integer id, Inventory inventory, InventoryCategory category, Integer purchasedQuantity, Integer soldQuantity, String inventorySku, Integer stampUser, LocalDate stampDate) {
         this.id = id;
         this.inventory = inventory;
-        this.categoryId = categoryId;
+        this.category = category;
         this.purchasedQuantity = purchasedQuantity;
         this.soldQuantity = soldQuantity;
         this.inventorySku = inventorySku;
@@ -61,12 +60,12 @@ public class InventoryInfo {
         this.inventory = inventory;
     }
 
-    public InventoryCategory getCategoryId() {
-        return categoryId;
+    public InventoryCategory getCategory() {
+        return category;
     }
 
-    public void setCategoryId(InventoryCategory categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(InventoryCategory category) {
+        this.category = category;
     }
 
     public Integer getPurchasedQuantity() {

@@ -4,16 +4,16 @@ public class BillModel {
     private Integer invInfoId;
     private Double amount;
     private String particulars;
-    private int quantity;
+    private int qty;
     private String sku;
     private Double unitCp;
     private Double unitSp;
 
-    public BillModel(Integer invInfoId, Double amount, String particulars, int quantity, String sku, Double unitCp, Double unitSp) {
+    public BillModel(Integer invInfoId, Double amount, String particulars, int qty, String sku, Double unitCp, Double unitSp) {
         this.invInfoId = invInfoId;
         this.amount = amount;
         this.particulars = particulars;
-        this.quantity = quantity;
+        this.qty = qty;
         this.sku = sku;
         this.unitCp = unitCp;
         this.unitSp = unitSp;
@@ -46,12 +46,12 @@ public class BillModel {
         this.particulars = particulars;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getQty() {
+        return qty;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setQty(int qty) {
+        this.qty = qty;
     }
 
     public String getSku() {
@@ -85,7 +85,7 @@ public class BillModel {
                 "invInfoId:" + invInfoId +
                 ", amount:" + amount +
                 ", particulars:'" + particulars + '\'' +
-                ", quantity:" + quantity +
+                ", quantity:" + qty +
                 ", sku:'" + sku + '\'' +
                 ", unitCp:" + unitCp +
                 ", unitSp:" + unitSp +

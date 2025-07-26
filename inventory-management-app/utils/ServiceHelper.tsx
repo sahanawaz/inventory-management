@@ -4,17 +4,17 @@ import { ENV_VAR } from "./EnvVariables";
 
 export const BASE_URL = ENV_VAR.API_URI;
 
-// axios.interceptors.request.use(
-//   (config) => {
-//     config.headers["sessionId"] = getSessionInfo();
-//     config.headers["userId"] = getUserInfo("userId");
-//     config.headers["personalId"] = getPersonalId();
-//     return config;
-//   },
-//   (error) => {
-//     Promise.reject(error);
-//   }
-// );
+axios.interceptors.request.use(
+  (config) => {
+    config.headers["sessionId"] = getSessionInfo();
+    config.headers["userId"] = getUserInfo("userId");
+    config.headers["personalId"] = getPersonalId();
+    return config;
+  },
+  (error) => {
+    Promise.reject(error);
+  }
+);
 
 export async function CallApiGet(argApiName: string) {
   try {

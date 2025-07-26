@@ -1,12 +1,14 @@
 package inv.mgm.services.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-public class Leadger {
+public class Ledger {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -32,12 +34,12 @@ public class Leadger {
 
     private Integer stampUser;
 
-    @OneToMany(mappedBy = "billId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<BillDtls> billItems;
+    @OneToMany(mappedBy = "ledger", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<BillDtls> billArr;
 
 
 
-    public Leadger(Integer id, Customer customerId, Double billAmount, Double taxAmount, Double taxPercent, Double discountAmount, LocalDate billDate, Integer stampUser) {
+    public Ledger(Integer id, Customer customerId, Double billAmount, Double taxAmount, Double taxPercent, Double discountAmount, LocalDate billDate, Integer stampUser) {
         this.id = id;
         this.customerId = customerId;
         this.billAmount = billAmount;
@@ -47,7 +49,7 @@ public class Leadger {
         this.billDate = billDate;
         this.stampUser = stampUser;
     }
-    public Leadger() {
+    public Ledger() {
         // Default constructor
     }
 
@@ -115,11 +117,11 @@ public class Leadger {
         this.stampUser = stampUser;
     }
 
-    public List<BillDtls> getBillItems() {
-        return billItems;
+    public List<BillDtls> getBillArr() {
+        return billArr;
     }
 
-    public void setBillItems(List<BillDtls> billItems) {
-        this.billItems = billItems;
+    public void setBillArr(List<BillDtls> billArr) {
+        this.billArr = billArr;
     }
 }

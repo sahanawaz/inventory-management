@@ -5,8 +5,8 @@ INSERT INTO
     public.sys_option (
         id,
         option_code,
-        option_value,
         option_desc,
+        option_value,
         info1,
         info2
     )
