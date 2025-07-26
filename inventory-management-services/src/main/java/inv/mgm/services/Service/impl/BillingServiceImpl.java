@@ -58,7 +58,13 @@ public class BillingServiceImpl implements BillingService {
             billDtls.setStampDate(LocalDate.now());
             billDtls.setQuantity(billItem.getQty());
             billDtls.setTaxAmount(0.0);
+<<<<<<< Updated upstream
             totalAmount += (billItem.getQty() * billItem.getUnitSp());
+=======
+            billDtls.setBillId(leadger);
+
+            totalAmount += billItem.getUnitSp();
+>>>>>>> Stashed changes
             bills.add(billDtls);
         }
         ledger.setBillAmount(totalAmount - billModel.getDiscount());
