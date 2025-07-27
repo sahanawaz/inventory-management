@@ -18,9 +18,9 @@ axios.interceptors.request.use(
 
 export async function CallApiGet(argApiName: string) {
   try {
-    console.log("======== Call API GET =========", ENV_VAR.API_URI);
     //======== Call API GET =========
     const apiUrl = ENV_VAR.API_URI + "/" + argApiName;
+    console.log("======== Call API GET =========", apiUrl);
     const resp = await axios.get(apiUrl);
     PostApiCallHandler(resp.data);
     return resp.data;
