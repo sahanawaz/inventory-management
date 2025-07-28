@@ -16,7 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import GradientBackground from "../utils/GradientBackground";
 import { SelectList } from "react-native-dropdown-select-list";
-import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
+import { DEFAULT_THEME_COLOR, ERR_MSG } from "../utils/SysConsts";
 import TextField, {
   DEFAULT_STYLES,
   DEFAULT_THEME_TXT,
@@ -47,24 +47,27 @@ const initDropdownOpts = {
   dimensionOpts: [],
 };
 
+const initFormData = {
+  categoryType: 0,
+  inventoryType: 0,
+  color: 0,
+  dimension: 0,
+  unitCp: 0,
+  unitSp: 0,
+  qty: 0,
+  date: new Date(),
+};
+
 const InventoryScreen = () => {
-  const [formData, setFormData] = useState<FormData>({
-    categoryType: 0,
-    inventoryType: 0,
-    color: 0,
-    dimension: 0,
-    unitCp: 0,
-    unitSp: 0,
-    qty: 0,
-    date: new Date(),
-  });
+  const [formData, setFormData] = useState<FormData>(
+    JSON.parse(JSON.stringify(initFormData))
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dropdownOpts, setDropdownOpts] = useState<DropdownOpts>(
     JSON.parse(JSON.stringify(initDropdownOpts))
   );
-  const { showModal, Modal } = useAlertModal();
+  const { showModal, hideModal, Modal } = useAlertModal();
   const { startAnimation, stopAnimation, Loader } = useLoader();
-  const [isLoaderVisible, setLoaderVisibility] = useState(false);
 
   useEffect(() => {
     fetchDropdownOpts();
@@ -162,6 +165,20 @@ const InventoryScreen = () => {
     </View>
   );
 
+  const handleOnAddInventory = async () => {
+    startAnimation();
+    const invResp = await CallApiPost("createStock", formData);
+    if (invResp.respCode === 200) {
+      openAlert(["Thank You, Inventory added successfully"], 0, "", () => {
+        hideModal();
+        setFormData(JSON.parse(JSON.stringify(initFormData)));
+      });
+    } else {
+      openAlert([ERR_MSG.E500], -1, "", () => {});
+    }
+    stopAnimation();
+  };
+
   return (
     <GradientBackground style={styles.container}>
       {Loader}
@@ -226,7 +243,9 @@ const InventoryScreen = () => {
             icon="calendar"
             textColor={DEFAULT_THEME_COLOR}
           >
-            {formData.date.toLocaleDateString()}
+            {`${new Date(formData?.date)?.getDate()}-${
+              new Date(formData?.date)?.getMonth() + 1
+            }-${new Date(formData?.date)?.getFullYear()}`}
           </Button>
           {showDatePicker && (
             <DateTimePicker
@@ -245,7 +264,7 @@ const InventoryScreen = () => {
 
         <Button
           mode="contained"
-          onPress={() => console.log(formData)}
+          onPress={handleOnAddInventory}
           style={styles.addButton}
           labelStyle={styles.buttonLabel}
         >
