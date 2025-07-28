@@ -117,6 +117,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   color="#d4af37"
                   onPress={() => navigation.navigate("Inventory")}
                 />
+                <Text style={styles.actionCardTitle}>SKU</Text>
+              </Card.Content>
+            </Card>
+          </TouchableOpacity>
+          {/*Inventory Screen */}
+          <TouchableOpacity
+            onPress={() => navigation.navigate("InventoryList")}
+          >
+            <Card style={styles.actionCard}>
+              <Card.Content style={styles.actionCardContent}>
+                <MaterialIcons
+                  name="menu-book"
+                  size={48}
+                  color="#d4af37"
+                  onPress={() => navigation.navigate("InventoryList")}
+                />
                 <Text style={styles.actionCardTitle}>Inventory</Text>
               </Card.Content>
             </Card>

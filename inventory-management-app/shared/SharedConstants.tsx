@@ -3,6 +3,7 @@ export type RootStackParamList = {
   Billing: undefined;
   Inventory: undefined;
   Ledger: undefined;
+  InventoryList: undefined;
 };
 
 export interface BillClass {

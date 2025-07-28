@@ -8,6 +8,7 @@ import GradientBackground from "../utils/GradientBackground";
 import { Platform, View } from "react-native";
 import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
 import LedgerScreen from "../components/LedgerScreen";
+import InventoryListScreen from "../components/InventoryListScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -54,6 +55,11 @@ const AppNavigator = () => {
           name="Ledger"
           component={LedgerScreen}
           options={{ title: "Ledger" }}
+        />
+        <Stack.Screen
+          name="InventoryList"
+          component={InventoryListScreen}
+          options={{ title: "InventoryList" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
