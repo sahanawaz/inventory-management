@@ -1,3 +1,9 @@
+CREATE TABLE public.sys_doc_number (
+    postfix varchar NULL,
+    num_seg1 varchar NULL,
+    num_seg2 int2 NULL
+);
+
 -- DROP FUNCTION public.fn_sys_generate_code();
 
 CREATE OR REPLACE FUNCTION public.fn_sys_generate_code()
