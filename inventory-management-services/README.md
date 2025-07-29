@@ -29,8 +29,17 @@ A Spring Boot application for managing users, inventory, and billing with Postgr
    spring.datasource.username=postgres
    spring.datasource.password=postgres
    ```
-4. Run the dommy.sql script to create the necessary data:
+4. Build and run the application:
+   ```bash
+   mvn clean install
+   mvn spring-boot:run
+   ```
+5. Run the dommy.sql script to create the necessary data:
    ```sql
    src/main/resources/db/dommy.sql
+   ```
+6. Run the functions.sql script to create the necessary functions:
+   ```sql
+   src/main/resources/db/functions.sql
    ```
 
