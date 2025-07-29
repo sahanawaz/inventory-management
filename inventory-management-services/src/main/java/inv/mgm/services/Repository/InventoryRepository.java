@@ -19,4 +19,8 @@ public interface InventoryRepository extends JpaRepository<InventoryInfo, Long> 
       List<String> saveInventory(@Param("userId") Integer userId,
                                        @Param("inventoryData") String inventoryData);
 
+    @Query("SELECT i FROM InventoryInfo i WHERE i.purchasedQuantity > i.soldQuantity")
+    List<InventoryInfo> findInventoryWherePurchasedGreaterThanSold();
+
+
 }

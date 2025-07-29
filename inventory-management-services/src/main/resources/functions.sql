@@ -78,7 +78,8 @@ BEGIN
             "unitCp" numeric(10,2),
             "unitSp" numeric(10,2),
             "qnt" integer,
-            "date" date
+            "date" date,
+			"description" varchar
         )
     ),
     t_data AS (
@@ -92,7 +93,7 @@ BEGIN
     t_ins_category AS (
         INSERT INTO inventory_category
         (stamp_date, stamp_user, category_type, color, dimension)
-        SELECT now(), arguserid, td."inventoryType", td.color, td.dimension
+        SELECT now(), arguserid, td."categoryType", td.color, td.dimension
         FROM t_data td
         WHERE td.category_id IS NULL
         RETURNING id
@@ -101,14 +102,14 @@ BEGIN
         SELECT vi.*, ic.id AS category_id
         FROM t_inv_info vi
         LEFT JOIN inventory_category ic
-            ON ic.category_type = vi."inventoryType"
+            ON ic.category_type = vi."categoryType"
             AND ic.color = vi."color"
             AND ic.dimension = vi."dimension"
     ),
     t_ins_inv AS (
         INSERT INTO inventory
-        ("date", stamp_date, stamp_user, unit_cp, unit_sp, inventory_type)
-        SELECT td.date, now(), arguserid, td."unitCp", td."unitSp", td."inventoryType"
+        ("date", stamp_date, stamp_user, unit_cp, unit_sp, inventory_type,inventory_desc)
+        SELECT td.date, now(), arguserid, td."unitCp", td."unitSp", td."inventoryType",td."description"
         FROM t_data2 td
         RETURNING id
     ),

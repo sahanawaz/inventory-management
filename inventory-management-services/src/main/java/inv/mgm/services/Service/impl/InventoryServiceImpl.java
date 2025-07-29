@@ -1,5 +1,7 @@
 package inv.mgm.services.Service.impl;
+import inv.mgm.services.Entity.InventoryCategory;
 import inv.mgm.services.Entity.InventoryInfo;
+import inv.mgm.services.Model.InventoryStockModel;
 import inv.mgm.services.Model.StockDataModel;
 import inv.mgm.services.Model.StockEntryModel;
 import inv.mgm.services.Repository.InventoryRepository;
@@ -9,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
@@ -21,10 +23,31 @@ public class InventoryServiceImpl implements InventoryService {
      * @return
      */
     @Override
-    public List<InventoryInfo> getAllStocks() {
+    public Map<String,List<InventoryStockModel>> getAllStocks() {
         // Fetch all inventory stocks from the repository
 //        .orElseThrow(() -> new RuntimeException("Product not found"))
-        return inventoryRepository.findAll();
+        List<InventoryInfo> stocks = inventoryRepository.findInventoryWherePurchasedGreaterThanSold();
+        Map<Object, List<InventoryInfo>> grp = stocks.parallelStream()
+                .collect(Collectors.groupingBy(a->a.getCategory().getCategoryType().getOptionValue()));
+        Map<String,List<InventoryStockModel>> mapData = new HashMap<>();
+        for(Object key:grp.keySet()){
+            List<InventoryStockModel> stockData = new ArrayList<>();
+            grp.get(key).parallelStream().forEach(a -> {
+                InventoryStockModel stockObj = new InventoryStockModel(
+                        a.getInventory().getInventoryType().getOptionValue(),
+                        a.getInventorySku(),
+                        a.getCategory().getColor().getOptionValue(),
+                        a.getCategory().getDimension().getOptionValue(),
+                        a.getInventory().getUnitCp(),
+                        a.getInventory().getUnitSp(),
+                        (a.getPurchasedQuantity() - a.getSoldQuantity()),
+                        a.getInventory().getDate().getDayOfMonth()+"/"+a.getInventory().getDate().getMonthValue()+"/"+a.getInventory().getDate().getYear()
+                );
+                stockData.add(stockObj);
+            });
+            mapData.put(key.toString(),stockData);
+        }
+        return mapData;
     }
 
     /**

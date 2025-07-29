@@ -20,6 +20,7 @@ public class StockEntryModel {
     private Double unitSp;
     private Integer qnt;
     private String date;
+    private String description;
 
     @Override
     public String toString() {
