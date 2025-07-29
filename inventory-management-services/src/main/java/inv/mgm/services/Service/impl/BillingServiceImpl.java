@@ -37,7 +37,7 @@ public class BillingServiceImpl implements BillingService {
             throw new IllegalArgumentException("Bill model or items cannot be null or empty");
         }
         Ledger ledger = new Ledger();
-        ledger.setId(billModel.getId());
+//        ledger.setId(billModel.getId());
         ledger.setCustomerId(getCustomerData(billModel.getCustomer()));
         ledger.setBillDate(LocalDate.now());
         ledger.setStampUser(0);
@@ -54,7 +54,9 @@ public class BillingServiceImpl implements BillingService {
             billDtls.setParticulars(billItem.getParticulars());
             billDtls.setStampUser(0);
             //get inventory info by SKU
-            billDtls.setInventoryInfo(getInventoryInfo(billItem.getSku()));
+            InventoryInfo info = getInventoryInfo(billItem.getSku());
+            info.setSoldQuantity(info.getSoldQuantity() + billItem.getQty());
+            billDtls.setInventoryInfo(info);
             billDtls.setStampDate(LocalDate.now());
             billDtls.setQuantity(billItem.getQty());
             billDtls.setTaxAmount(0.0);
