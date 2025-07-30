@@ -40,3 +40,9 @@ export const months = [
   "Nov",
   "Dec",
 ];
+
+export const HTTP_STATUS = {
+  OK: 200,
+  INTERNAL_SERVER_ERR: 500,
+  CREATED: 201,
+};

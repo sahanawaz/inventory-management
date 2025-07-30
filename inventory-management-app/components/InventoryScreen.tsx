@@ -1,31 +1,18 @@
-import React, { useState, useMemo, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TextInput as RNTextInput,
-} from "react-native";
-import {
-  Text,
-  Button,
-  useTheme,
-  TextInput,
-  ActivityIndicator,
-} from "react-native-paper";
-import { LinearGradient } from "expo-linear-gradient";
+import React, { useState, useCallback, useEffect } from "react";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { Text, Button } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import GradientBackground from "../utils/GradientBackground";
 import { SelectList } from "react-native-dropdown-select-list";
-import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
-import TextField, {
-  DEFAULT_STYLES,
-  DEFAULT_THEME_TXT,
-} from "../utils/TextField";
+import { DEFAULT_THEME_COLOR, ERR_MSG, HTTP_STATUS } from "../utils/SysConsts";
+import TextField from "../utils/TextField";
 import { textFieldStyles } from "../shared/SharedStyles";
-import { CallApiGet, CallApiPost } from "../utils/ServiceHelper";
-import { DropdownOpts } from "../shared/SharedConstants";
+import { CallApiPost } from "../utils/ServiceHelper";
+import { DropdownOpts, RootStackParamList } from "../shared/SharedConstants";
 import useAlertModal from "../helper/useAlertModal";
 import useLoader from "../helper/useLoader";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { useFocusEffect } from "@react-navigation/native";
 
 type FormData = {
   categoryType: number;
@@ -36,6 +23,7 @@ type FormData = {
   unitSp: number;
   qty: number;
   date: Date;
+  description: string;
 };
 
 type FormDataKeys = keyof FormData;
@@ -47,28 +35,45 @@ const initDropdownOpts = {
   dimensionOpts: [],
 };
 
-const InventoryScreen = () => {
-  const [formData, setFormData] = useState<FormData>({
-    categoryType: 0,
-    inventoryType: 0,
-    color: 0,
-    dimension: 0,
-    unitCp: 0,
-    unitSp: 0,
-    qty: 0,
-    date: new Date(),
-  });
+const initFormData = {
+  categoryType: 0,
+  inventoryType: 0,
+  color: 0,
+  dimension: 0,
+  unitCp: 0,
+  unitSp: 0,
+  qty: 0,
+  date: new Date(),
+  description: "",
+};
+
+type InventoryScreenProps = {
+  navigation: StackNavigationProp<RootStackParamList, "Inventory">;
+};
+
+const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
+  const [formData, setFormData] = useState<FormData>(
+    JSON.parse(JSON.stringify(initFormData))
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dropdownOpts, setDropdownOpts] = useState<DropdownOpts>(
     JSON.parse(JSON.stringify(initDropdownOpts))
   );
-  const { showModal, Modal } = useAlertModal();
+  const { showModal, hideModal, Modal } = useAlertModal();
   const { startAnimation, stopAnimation, Loader } = useLoader();
-  const [isLoaderVisible, setLoaderVisibility] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchDropdownOpts();
+    }, [])
+  );
 
   useEffect(() => {
-    fetchDropdownOpts();
-  }, []);
+    const unsubscribe = navigation.addListener("focus", () => {
+      setFormData(JSON.parse(JSON.stringify(initFormData))); // Clear the selected value
+    });
+    return unsubscribe; // Clean up the listener
+  }, [navigation]);
 
   const openAlert = (
     argMsg: string[],
@@ -95,7 +100,7 @@ const InventoryScreen = () => {
       "CATEGORY_TYPE",
       "INVENTORY_TYPE",
     ]);
-    if (optResp.respCode === 200) {
+    if (optResp.respCode === HTTP_STATUS.OK) {
       setDropdownOpts({
         catTypeOpts: optResp.respData.filter(
           (opt: { code: string }) => opt.code === "CATEGORY_TYPE"
@@ -123,7 +128,7 @@ const InventoryScreen = () => {
     stopAnimation();
   };
 
-  const handleChange = (field: string, value: number | Date) => {
+  const handleChange = (field: string, value: number | Date | string) => {
     setFormData({ ...formData, [field]: value });
     if (field === "date") {
       setShowDatePicker(false);
@@ -162,10 +167,34 @@ const InventoryScreen = () => {
     </View>
   );
 
+  const handleOnAddInventory = async () => {
+    startAnimation();
+    const invResp = await CallApiPost("createStock", formData);
+    if (invResp.respCode === HTTP_STATUS.CREATED) {
+      openAlert(["Thank You, Inventory added successfully"], 0, "", () => {
+        hideModal();
+        setFormData(JSON.parse(JSON.stringify(initFormData)));
+        navigation.navigate("InventoryList");
+      });
+    } else {
+      openAlert([ERR_MSG.E500], -1, "", () => {});
+    }
+    stopAnimation();
+  };
+
   return (
     <GradientBackground style={styles.container}>
       {Loader}
       <ScrollView contentContainerStyle={styles.contentContainer}>
+        <TextField
+          label={
+            <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
+              Particular *
+            </Text>
+          }
+          value={formData?.description?.toString()}
+          onChangeHandler={(v: any) => handleChange("description", String(v))}
+        />
         {/* Dropdowns */}
         {renderDropdown(
           "categoryType",
@@ -181,14 +210,14 @@ const InventoryScreen = () => {
         {renderDropdown("dimension", "Dimension", dropdownOpts.dimensionOpts)}
 
         {/* Other inputs remain the same as previous implementation */}
-        {/* Weight Input */}
+        {/* Cost Price Input */}
         <TextField
           label={
             <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
               Unit Cost Price *
             </Text>
           }
-          value={formData.unitCp.toString()}
+          value={formData?.unitCp?.toString()}
           onChangeHandler={(v: any) =>
             handleChange("unitCp", parseFloat(v) || 0)
           }
@@ -200,7 +229,7 @@ const InventoryScreen = () => {
               Unit Selling Price *
             </Text>
           }
-          value={formData.unitSp.toString()}
+          value={formData?.unitSp?.toString()}
           onChangeHandler={(v: any) =>
             handleChange("unitSp", parseFloat(v) || 0)
           }
@@ -212,7 +241,7 @@ const InventoryScreen = () => {
               Quantity
             </Text>
           }
-          value={formData.qty.toString()}
+          value={formData?.qty?.toString()}
           onChangeHandler={(v: any) => handleChange("qty", parseFloat(v) || 0)}
           keyboardType="numeric"
         />
@@ -226,11 +255,13 @@ const InventoryScreen = () => {
             icon="calendar"
             textColor={DEFAULT_THEME_COLOR}
           >
-            {formData.date.toLocaleDateString()}
+            {`${new Date(formData?.date)?.getDate()}-${
+              new Date(formData?.date)?.getMonth() + 1
+            }-${new Date(formData?.date)?.getFullYear()}`}
           </Button>
           {showDatePicker && (
             <DateTimePicker
-              value={formData.date}
+              value={new Date(formData?.date)}
               mode="date"
               display="default"
               onChange={(event, selectedDate) => {
@@ -239,13 +270,14 @@ const InventoryScreen = () => {
                   handleChange("date", selectedDate);
                 }
               }}
+              maximumDate={new Date()}
             />
           )}
         </View>
 
         <Button
           mode="contained"
-          onPress={() => console.log(formData)}
+          onPress={handleOnAddInventory}
           style={styles.addButton}
           labelStyle={styles.buttonLabel}
         >

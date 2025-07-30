@@ -1,7 +1,7 @@
 package inv.mgm.services.Service.impl;
-import inv.mgm.services.Entity.InventoryCategory;
 import inv.mgm.services.Entity.InventoryInfo;
 import inv.mgm.services.Model.InventoryStockModel;
+import inv.mgm.services.Model.SkuFilterDto;
 import inv.mgm.services.Model.StockDataModel;
 import inv.mgm.services.Model.StockEntryModel;
 import inv.mgm.services.Repository.InventoryRepository;
@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,10 +25,13 @@ public class InventoryServiceImpl implements InventoryService {
      * @return
      */
     @Override
-    public Map<String,List<InventoryStockModel>> getAllStocks() {
+    public Map<String,List<InventoryStockModel>> getAllStocks(SkuFilterDto filterDto) {
         // Fetch all inventory stocks from the repository
 //        .orElseThrow(() -> new RuntimeException("Product not found"))
-        List<InventoryInfo> stocks = inventoryRepository.findInventoryWherePurchasedGreaterThanSold();
+        List<InventoryInfo> stocks = inventoryRepository.findInventoryWherePurchasedGreaterThanSold(
+                filterDto.fromDt.orElse(LocalDate.now().minusDays(7)), filterDto.toDt.orElse(LocalDate.now())
+        );
+
         Map<Object, List<InventoryInfo>> grp = stocks.parallelStream()
                 .collect(Collectors.groupingBy(a->a.getCategory().getCategoryType().getOptionValue()));
         Map<String,List<InventoryStockModel>> mapData = new HashMap<>();
@@ -35,19 +40,43 @@ public class InventoryServiceImpl implements InventoryService {
             grp.get(key).parallelStream().forEach(a -> {
                 InventoryStockModel stockObj = new InventoryStockModel(
                         a.getInventory().getInventoryType().getOptionValue(),
+                        a.getCategory().getCategoryType().getOptionValue(),
                         a.getInventorySku(),
                         a.getCategory().getColor().getOptionValue(),
                         a.getCategory().getDimension().getOptionValue(),
                         a.getInventory().getUnitCp(),
                         a.getInventory().getUnitSp(),
+                        a.getPurchasedQuantity(),
+                        a.getSoldQuantity(),
                         (a.getPurchasedQuantity() - a.getSoldQuantity()),
-                        a.getInventory().getDate().getDayOfMonth()+"/"+a.getInventory().getDate().getMonthValue()+"/"+a.getInventory().getDate().getYear()
+                        a.getInventory().getDate().getDayOfMonth()+"/"+a.getInventory().getDate().getMonthValue()+"/"+a.getInventory().getDate().getYear(),
+                        a.getInventory().getInventoryDesc()
                 );
                 stockData.add(stockObj);
             });
             mapData.put(key.toString(),stockData);
         }
         return mapData;
+    }
+
+    @Override
+    public List<InventoryStockModel> getAllStocksByDateRange(SkuFilterDto filterDto) {
+        List<InventoryInfo> stocks = inventoryRepository.findInventoryWherePurchasedGreaterThanSold(
+                filterDto.fromDt.orElse(LocalDate.now().minusDays(7)), filterDto.toDt.orElse(LocalDate.now())
+        );
+        return stocks.parallelStream().map(a -> new InventoryStockModel(
+                a.getInventory().getInventoryType().getOptionValue(),
+                a.getCategory().getCategoryType().getOptionValue(),
+                a.getInventorySku(),
+                a.getCategory().getColor().getOptionValue(),
+                a.getCategory().getDimension().getOptionValue(),
+                a.getInventory().getUnitCp(),
+                a.getInventory().getUnitSp(),
+                a.getPurchasedQuantity(),
+                a.getSoldQuantity(),
+                (a.getPurchasedQuantity() - a.getSoldQuantity()),
+                a.getInventory().getDate().getDayOfMonth()+"/"+a.getInventory().getDate().getMonthValue()+"/"+a.getInventory().getDate().getYear(),
+                a.getInventory().getInventoryDesc())).toList();
     }
 
     /**

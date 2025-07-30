@@ -1,6 +1,7 @@
 package inv.mgm.services.Controller;
 
 import inv.mgm.services.Model.GenericResponse;
+import inv.mgm.services.Model.SkuFilterDto;
 import inv.mgm.services.Model.StockDataModel;
 import inv.mgm.services.Model.StockEntryModel;
 import inv.mgm.services.Service.InventoryService;
@@ -27,13 +28,13 @@ public class InventoryController {
          *
          * @return a list of all inventory stocks
          */
-    @GetMapping("/getStocks")
-        public ResponseEntity<GenericResponse> getAllStocks() {
+    @PostMapping("/getStocks")
+        public ResponseEntity<GenericResponse> getAllStocks(@RequestBody SkuFilterDto filterDto) {
             try {
                 return ResponseEntity.ok(GenericResponse.builder()
                                 .respCode(HttpStatus.OK.value())
                                 .respMesaage("SUC")
-                                .respData(inventoryService.getAllStocks())
+                                .respData(inventoryService.getAllStocksByDateRange(filterDto))
                         .build());
             } catch (Exception e) {
                 logger.error("Error fetching stocks", e);

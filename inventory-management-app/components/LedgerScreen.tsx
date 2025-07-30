@@ -9,11 +9,16 @@ import {
 import GradientBackground from "../utils/GradientBackground";
 import { Card, DataTable, Text } from "react-native-paper";
 import { ledgerData } from "../utils/SysData";
-import { DEFAULT_THEME_COLOR, months } from "../utils/SysConsts";
+import { DEFAULT_THEME_COLOR, ERR_MSG, months } from "../utils/SysConsts";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useFocusEffect } from "@react-navigation/native";
+import useAlertModal from "../helper/useAlertModal";
+import useLoader from "../helper/useLoader";
+import { CallApiGet } from "../utils/ServiceHelper";
 const { width, height } = Dimensions.get("window");
 const LedgerScreen = () => {
+  const { showModal, Modal } = useAlertModal();
+  const { startAnimation, stopAnimation } = useLoader();
   const [locDate, setLocDate] = useState<{
     startDate: Date;
     endDate: Date;
@@ -21,6 +26,10 @@ const LedgerScreen = () => {
     startDate: new Date(),
     endDate: new Date(),
   });
+  const [showStartPicker, setShowStartPicker] = useState(false);
+  const [showEndPicker, setShowEndPicker] = useState(false);
+  const [tapCounter, setTapCounter] = useState(0);
+  const [ledgerData, setLedgerData] = useState<any[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -28,18 +37,54 @@ const LedgerScreen = () => {
       let lstartDate = new Date();
       lstartDate.setDate(lendDate.getDate() - 7);
       setLocDate({ startDate: lstartDate, endDate: lendDate });
+      fetchBills(lstartDate, lendDate);
     }, [])
   );
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
-  const [tapCounter, setTapCounter] = useState(0);
-  const totalGrossProfit = ledgerData.reduce(
-    (sum, item) => sum + item.profit,
-    0
-  );
 
-  const formatCurrency = (amount: number): string => {
-    return `₹${amount.toLocaleString("en-IN")}`;
+  const totalGrossProfit = () => {
+    const totalSp = ledgerData?.reduce(
+      (sum, item) => sum + item?.billAmount,
+      0
+    );
+    const totalCp = ledgerData?.reduce(
+      (sum, ledger) => sum + getCostPrice(ledger),
+      0
+    );
+    return (totalSp - totalCp).toFixed(2);
+  };
+
+  const fetchBills = async (argStartDt: Date, argEndDt: Date) => {
+    startAnimation();
+    const reqStartDt = `${argStartDt.getFullYear()}-${(
+      argStartDt.getMonth() + 1
+    )
+      .toString()
+      .padStart(2, "0")}-${argStartDt.getDate().toString().padStart(2, "0")}`;
+    const reqEndDt = `${argEndDt.getFullYear()}-${(argEndDt.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${argEndDt.getDate().toString().padStart(2, "0")}`;
+    const ledgerResp = await CallApiGet(
+      `getBillsBasedOnDate?startDt=${reqStartDt}&endDt=${reqEndDt}`
+    );
+    if (ledgerResp.respCode === 200) {
+      setLedgerData(ledgerResp.respData);
+    } else {
+      showModal({
+        visible: true,
+        isSuccess: -1,
+        message: [ERR_MSG.E500],
+        iconSrc: "",
+      });
+    }
+    stopAnimation();
+  };
+
+  const getCostPrice = (item: any): number => {
+    return item?.billArr?.reduce(
+      (sum: number, bill: any) =>
+        sum + bill?.quantity * bill?.inventoryInfo?.inventory?.unitCp,
+      0
+    );
   };
   const formatDateRange = (): string => {
     const startDay = locDate?.startDate?.getDate().toString().padStart(2, "0");
@@ -78,8 +123,33 @@ const LedgerScreen = () => {
     }
     setTapCounter(tapCounter + 1);
   };
+
+  const renderCostDtls = (item: any) => {
+    const cp = getCostPrice(item);
+    return (
+      <View style={styles.priceContainer}>
+        <View style={styles.priceItem}>
+          <Text style={styles.priceLabel}>Cost</Text>
+          <Text style={styles.costPrice}>₹{cp.toFixed(2)}</Text>
+        </View>
+
+        <View style={styles.priceItem}>
+          <Text style={styles.priceLabel}>Sell</Text>
+          <Text style={styles.sellPrice}>₹{item.billAmount.toFixed(2)}</Text>
+        </View>
+
+        <View style={styles.priceItem}>
+          <Text style={styles.priceLabel}>Profit</Text>
+          <Text style={styles.profitPrice}>
+            ₹{(item.billAmount - cp).toFixed(2)}
+          </Text>
+        </View>
+      </View>
+    );
+  };
   return (
     <GradientBackground>
+      {Modal}
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Summary Card with Vertical Divider */}
         <Card style={styles.summaryCard}>
@@ -102,9 +172,7 @@ const LedgerScreen = () => {
               {/* Gross Profit Section */}
               <View style={styles.profitSection}>
                 <Text style={styles.sectionLabel}>Gross Profit</Text>
-                <Text style={styles.grossProfit}>
-                  {formatCurrency(totalGrossProfit)}
-                </Text>
+                <Text style={styles.grossProfit}>{totalGrossProfit()}</Text>
                 <Text style={styles.profitSubtext}>Total Earnings</Text>
               </View>
             </View>
@@ -114,47 +182,36 @@ const LedgerScreen = () => {
         {/* Transaction Cards */}
         <View style={styles.transactionsList}>
           {ledgerData.map((item, index) => (
-            <Card key={index} style={styles.transactionCard}>
-              <Card.Content>
-                <View style={styles.cardHeader}>
-                  <View style={styles.leftSection}>
-                    <Text style={styles.productName}>{item.product}</Text>
-                    <Text style={styles.skuText}>{item.sku}</Text>
-                  </View>
-                  <View style={styles.rightSection}>
-                    <Text style={styles.dateText}>{item.date}</Text>
-                    <Text style={styles.quantityText}>
-                      Qty: {item.quantity}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.divider} />
-
-                <View style={styles.priceContainer}>
-                  <View style={styles.priceItem}>
-                    <Text style={styles.priceLabel}>Cost</Text>
-                    <Text style={styles.costPrice}>
-                      {formatCurrency(item.costPrice)}
-                    </Text>
-                  </View>
-
-                  <View style={styles.priceItem}>
-                    <Text style={styles.priceLabel}>Sell</Text>
-                    <Text style={styles.sellPrice}>
-                      {formatCurrency(item.sellPrice)}
-                    </Text>
+            <TouchableOpacity key={index}>
+              <Card style={styles.transactionCard}>
+                <Card.Content>
+                  <View style={styles.cardHeader}>
+                    <View style={styles.leftSection}>
+                      <Text style={styles.productName}>
+                        {item?.customerId?.name}
+                      </Text>
+                      <Text style={styles.skuText}>
+                        {item?.customerId?.phone}
+                      </Text>
+                    </View>
+                    <View style={styles.rightSection}>
+                      <Text style={styles.dateText}>{item?.billDate}</Text>
+                      <Text style={styles.quantityText}>
+                        Qty:{" "}
+                        {item?.billArr?.reduce(
+                          (sum: number, item: { quantity: number }) =>
+                            sum + item.quantity,
+                          0
+                        )}
+                      </Text>
+                    </View>
                   </View>
 
-                  <View style={styles.priceItem}>
-                    <Text style={styles.priceLabel}>Profit</Text>
-                    <Text style={styles.profitPrice}>
-                      {formatCurrency(item.profit)}
-                    </Text>
-                  </View>
-                </View>
-              </Card.Content>
-            </Card>
+                  <View style={styles.divider} />
+                  {renderCostDtls(item)}
+                </Card.Content>
+              </Card>
+            </TouchableOpacity>
           ))}
         </View>
       </ScrollView>

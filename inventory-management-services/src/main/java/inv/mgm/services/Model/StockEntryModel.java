@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,7 +16,7 @@ public class StockEntryModel {
     private Integer dimension;
     private Double unitCp;
     private Double unitSp;
-    private Integer qnt;
+    private Integer qty;
     private String date;
     private String description;
 

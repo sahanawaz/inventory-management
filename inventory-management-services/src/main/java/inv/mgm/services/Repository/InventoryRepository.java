@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface InventoryRepository extends JpaRepository<InventoryInfo, Long> {
@@ -18,9 +19,8 @@ public interface InventoryRepository extends JpaRepository<InventoryInfo, Long> 
      @Query(value = "SELECT sku FROM fn_inventory_save(:userId, :inventoryData ::JSONB)",nativeQuery = true)
       List<String> saveInventory(@Param("userId") Integer userId,
                                        @Param("inventoryData") String inventoryData);
-
-    @Query("SELECT i FROM InventoryInfo i WHERE i.purchasedQuantity > i.soldQuantity")
-    List<InventoryInfo> findInventoryWherePurchasedGreaterThanSold();
+    @Query("SELECT i FROM InventoryInfo i WHERE i.purchasedQuantity > i.soldQuantity AND i.inventory.date BETWEEN :fromDt AND :toDt ORDER BY i.id DESC")
+    List<InventoryInfo> findInventoryWherePurchasedGreaterThanSold(@Param("fromDt") LocalDate fromDt, @Param("toDt") LocalDate toDt);
 
 
 }

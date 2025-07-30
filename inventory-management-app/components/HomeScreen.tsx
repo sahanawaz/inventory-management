@@ -112,7 +112,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             <Card style={styles.actionCard}>
               <Card.Content style={styles.actionCardContent}>
                 <MaterialIcons
-                  name="store"
+                  name="category"
                   size={48}
                   color="#d4af37"
                   onPress={() => navigation.navigate("Inventory")}
@@ -128,7 +128,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             <Card style={styles.actionCard}>
               <Card.Content style={styles.actionCardContent}>
                 <MaterialIcons
-                  name="menu-book"
+                  name="store"
                   size={48}
                   color="#d4af37"
                   onPress={() => navigation.navigate("InventoryList")}

@@ -77,7 +77,7 @@ BEGIN
             "dimension" Integer,
             "unitCp" numeric(10,2),
             "unitSp" numeric(10,2),
-            "qnt" integer,
+            "qty" integer,
             "date" date,
 			"description" varchar
         )
@@ -86,7 +86,7 @@ BEGIN
         SELECT vi.*, ic.id AS category_id
         FROM t_inv_info vi
         LEFT JOIN inventory_category ic
-            ON ic.category_type = vi."inventoryType"
+            ON ic.category_type = vi."categoryType"
             AND ic.color = vi."color"
             AND ic.dimension = vi."dimension"
     ),
@@ -116,7 +116,7 @@ BEGIN
     t_ins_inv_info AS (
         INSERT INTO inventory_info
         (inventory_sku, purchased_quantity, sold_quantity, stamp_date, stamp_user, category_id, inventory_id)
-        SELECT fn_sys_generate_code(), td."qnt", 0, now(), arguserid, tc.id, ti.id
+        SELECT fn_sys_generate_code(), td."qty", 0, now(), arguserid, tc.id, ti.id
         FROM t_data2 td
         FULL JOIN t_ins_inv ti ON true
 		FULL JOIN t_ins_category tc ON true
