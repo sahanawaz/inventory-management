@@ -99,6 +99,7 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public List<String> createStock(Integer userId, StockEntryModel stockDataModel) {
         List<StockEntryModel> stockEntryModels = new ArrayList<>();
+        stockDataModel = validateStockModel(stockDataModel);
         stockEntryModels.add(stockDataModel);
         String stockStr = stockEntryModels.toString();
         logger.info("InventoryService.createStock ---> userId: {}, stockDataModel: {}", userId, stockStr);
@@ -106,5 +107,15 @@ public class InventoryServiceImpl implements InventoryService {
         return inventoryRepository.saveInventory(userId, stockStr);
     }
 
+    StockEntryModel validateStockModel(StockEntryModel model){
+        if(Objects.nonNull(model.getColor()) && model.getColor() == 0 )
+            model.setColor(null);
+        else if (Objects.nonNull(model.getDimension()) && model.getDimension() == 0 ) {
+            model.setDimension(null);
+        } else if (Objects.nonNull(model.getCategoryType()) && model.getCategoryType() == 0 ) {
+            model.setCategoryType(null);
+        }
+        return model;
+    }
 
 }
