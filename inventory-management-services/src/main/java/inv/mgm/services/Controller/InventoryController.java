@@ -80,5 +80,24 @@ public class InventoryController {
         }
     }
 
+    //get stock for re-stock
+//    @PostMapping("/getStockForRestock")
+//    public ResponseEntity<GenericResponse> getStockForRestock(@RequestBody SkuFilterDto filterDto) {
+//        try {
+//            return ResponseEntity.ok(GenericResponse.builder()
+//                    .respCode(HttpStatus.OK.value())
+//                    .respMesaage("SUC")
+//                    .respData(inventoryService.getStockForRestock(filterDto))
+//                    .build());
+//        } catch (Exception e) {
+//            logger.error("Error fetching stocks for restock", e);
+//            return ResponseEntity.ok(GenericResponse.builder()
+//                    .respCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                    .respMesaage(Constants.SYS_ERR_MSG)
+//                    .build());
+//        }
+//    }
+
+    //if we add multiple stocks at once, then how return the skus?
 
 }
