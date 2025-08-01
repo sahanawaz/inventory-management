@@ -67,8 +67,8 @@ CREATE OR REPLACE FUNCTION public.fn_inventory_save(arguserid integer, argdata j
  LANGUAGE plpgsql
 AS $function$
 BEGIN
-    RETURN QUERY
-    WITH t_inv_info AS (
+
+	WITH t_inv_info AS (
         SELECT * FROM jsonb_to_recordset(argdata)
         AS info_data(
             "categoryType" Integer,
@@ -89,14 +89,27 @@ BEGIN
             ON ic.category_type = vi."categoryType"
             AND ic.color = vi."color"
             AND ic.dimension = vi."dimension"
-    ),
-    t_ins_category AS (
-        INSERT INTO inventory_category
-        (stamp_date, stamp_user, category_type, color, dimension)
-        SELECT now(), arguserid, td."categoryType", td.color, td.dimension
-        FROM t_data td
-        WHERE td.category_id IS NULL
-        RETURNING id
+    )
+    INSERT INTO inventory_category
+    (stamp_date, stamp_user, category_type, color, dimension)
+    SELECT now(), arguserid, td."categoryType", td.color, td.dimension
+    FROM t_data td
+    WHERE td.category_id IS NULL;
+
+    RETURN QUERY
+    WITH t_inv_info AS (
+        SELECT * FROM jsonb_to_recordset(argdata)
+        AS info_data(
+            "categoryType" Integer,
+            "inventoryType" integer,
+            "color" integer,
+            "dimension" Integer,
+            "unitCp" numeric(10,2),
+            "unitSp" numeric(10,2),
+            "qty" integer,
+            "date" date,
+			"description" varchar
+        )
     ),
     t_data2 AS (
         SELECT vi.*, ic.id AS category_id
@@ -116,10 +129,10 @@ BEGIN
     t_ins_inv_info AS (
         INSERT INTO inventory_info
         (inventory_sku, purchased_quantity, sold_quantity, stamp_date, stamp_user, category_id, inventory_id)
-        SELECT fn_sys_generate_code(), td."qty", 0, now(), arguserid, tc.id, ti.id
+        SELECT fn_sys_generate_code(), td."qty", 0, now(), arguserid, td.category_id, ti.id
         FROM t_data2 td
         FULL JOIN t_ins_inv ti ON true
-		FULL JOIN t_ins_category tc ON true
+	--	FULL JOIN t_ins_category tc ON true
         RETURNING inventory_sku
     )
     SELECT inventory_sku FROM t_ins_inv_info;
