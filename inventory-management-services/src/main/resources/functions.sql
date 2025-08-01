@@ -23,7 +23,7 @@ BEGIN
 
     -- Construct the prefix (e.g., '0725' for July 2025)
     -- Using varmonth directly as it's already zero-padded
-    varprfx := varmonth || RIGHT(varyear,2);
+    varprfx := RIGHT(varyear,2) || varmonth;
 
     --- Attempt to update the document format table by incrementing num_seg2
     --- The RETURNING clause will populate varoutprfx, varnumber, and varpostfix
@@ -53,7 +53,7 @@ BEGIN
     -- Construct the new document number
     -- Assuming format: POSTFIX + PREFIX (MMYY) + NUMBER (3 digits, zero-padded)
     -- Example: A0725001, B0725001 etc.
-    varnewdocno := varpostfix || varprfx || LPAD(varnumber::varchar, 2, '0');
+    varnewdocno := varprfx || varpostfix || LPAD(varnumber::varchar, 2, '0');
 
     RETURN varnewdocno;
 END;
