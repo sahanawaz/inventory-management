@@ -1,6 +1,9 @@
 import React, { useCallback, useState } from "react";
 import {
   Dimensions,
+  FlatList,
+  FlatListProps,
+  ListRenderItemInfo,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -15,6 +18,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import useAlertModal from "../helper/useAlertModal";
 import useLoader from "../helper/useLoader";
 import { CallApiGet, CallApiPost } from "../utils/ServiceHelper";
+import { InventoryItemType } from "../shared/SharedInterface";
 const { width, height } = Dimensions.get("window");
 const LedgerScreen = () => {
   const { showModal, Modal } = useAlertModal();
@@ -29,7 +33,7 @@ const LedgerScreen = () => {
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
   const [tapCounter, setTapCounter] = useState(0);
-  const [inventoryList, setInventoryList] = useState<any[]>([]);
+  const [inventoryList, setInventoryList] = useState<InventoryItemType[]>([]);
 
   useFocusEffect(
     useCallback(() => {
@@ -146,10 +150,38 @@ const LedgerScreen = () => {
       </View>
     );
   };
+
+  const renderInventoryCard = ({
+    item,
+  }: ListRenderItemInfo<InventoryItemType>) => (
+    <TouchableOpacity>
+      <Card style={styles.transactionCard}>
+        <Card.Content>
+          <View style={styles.cardHeader}>
+            <View style={styles.leftSection}>
+              <Text style={styles.productName}>{item?.particular}</Text>
+              <Text style={styles.skuText}>
+                {item?.inventoryType}-{item?.categoryType}
+              </Text>
+            </View>
+            <View style={styles.rightSection}>
+              <Text style={styles.dateText}>{item?.sku}</Text>
+              <Text style={styles.quantityText}>
+                {item?.color}-{item?.dimension}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
+          {renderCostDtls(item)}
+        </Card.Content>
+      </Card>
+    </TouchableOpacity>
+  );
   return (
     <GradientBackground>
       {Modal}
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.content}>
         {/* Summary Card with Vertical Divider */}
         <Card style={styles.summaryCard}>
           <Card.Content>
@@ -179,36 +211,12 @@ const LedgerScreen = () => {
             </View>
           </Card.Content>
         </Card>
-
-        {/* Transaction Cards */}
-        <View style={styles.transactionsList}>
-          {inventoryList.map((item, index) => (
-            <TouchableOpacity key={index}>
-              <Card style={styles.transactionCard}>
-                <Card.Content>
-                  <View style={styles.cardHeader}>
-                    <View style={styles.leftSection}>
-                      <Text style={styles.productName}>{item?.particular}</Text>
-                      <Text style={styles.skuText}>
-                        {item?.inventoryType}-{item?.categoryType}
-                      </Text>
-                    </View>
-                    <View style={styles.rightSection}>
-                      <Text style={styles.dateText}>{item?.sku}</Text>
-                      <Text style={styles.quantityText}>
-                        {item?.color}-{item?.dimension}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.divider} />
-                  {renderCostDtls(item)}
-                </Card.Content>
-              </Card>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
+        <FlatList
+          data={inventoryList}
+          keyExtractor={(item) => item.sku}
+          renderItem={renderInventoryCard}
+        />
+      </View>
       {/* Date Picker Modals */}
       {showStartPicker && (
         <DateTimePicker

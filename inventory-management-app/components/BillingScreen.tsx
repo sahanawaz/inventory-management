@@ -6,7 +6,7 @@ import {
   BillClass,
   CustBillClass,
   RootStackParamList,
-} from "../shared/SharedConstants";
+} from "../shared/SharedInterface";
 import { Double } from "react-native/Libraries/Types/CodegenTypes";
 import GradientBackground from "../utils/GradientBackground";
 import TextField from "../utils/TextField";

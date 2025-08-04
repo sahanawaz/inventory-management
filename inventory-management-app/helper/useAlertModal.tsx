@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { AlertModalConfig } from "../shared/SharedConstants";
+import { AlertModalConfig } from "../shared/SharedInterface";
 import AlertModal from "../utils/AlertModal";
 
 type ModalType = "SUC" | "ERR";

@@ -9,7 +9,7 @@ import {
   TextInput,
 } from "react-native-paper";
 import { initBillObj } from "../utils/SysConsts";
-import { BillClass, SkuClass } from "../shared/SharedConstants";
+import { BillClass, SkuClass } from "../shared/SharedInterface";
 import { modalStyles } from "../shared/SharedStyles";
 
 interface SkuProps {

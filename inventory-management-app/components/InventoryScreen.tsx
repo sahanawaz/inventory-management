@@ -8,7 +8,7 @@ import { DEFAULT_THEME_COLOR, ERR_MSG, HTTP_STATUS } from "../utils/SysConsts";
 import TextField from "../utils/TextField";
 import { textFieldStyles } from "../shared/SharedStyles";
 import { CallApiPost } from "../utils/ServiceHelper";
-import { DropdownOpts, RootStackParamList } from "../shared/SharedConstants";
+import { DropdownOpts, RootStackParamList } from "../shared/SharedInterface";
 import useAlertModal from "../helper/useAlertModal";
 import useLoader from "../helper/useLoader";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -36,10 +36,10 @@ const initDropdownOpts = {
 };
 
 const initFormData = {
-  categoryType: 0,
-  inventoryType: 0,
-  color: 0,
-  dimension: 0,
+  categoryType: null,
+  inventoryType: null,
+  color: null,
+  dimension: null,
   unitCp: 0,
   unitSp: 0,
   qty: 0,
@@ -59,18 +59,31 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
   const [dropdownOpts, setDropdownOpts] = useState<DropdownOpts>(
     JSON.parse(JSON.stringify(initDropdownOpts))
   );
+  const [dropdownRefs, setDropdownRefs] = useState({
+    catTypeDropdown: false,
+    invTypeDropdown: false,
+    colorDropdown: false,
+    dimensionDropdown: false,
+  });
   const { showModal, hideModal, Modal } = useAlertModal();
   const { startAnimation, stopAnimation, Loader } = useLoader();
 
+  const resetFormData = () => {
+    setFormData(JSON.parse(JSON.stringify(initFormData)));
+    // Object.values(dropdownRefs).forEach((ref) =>
+    //   ref.current?.setSelected(null)
+    // );
+  };
   useFocusEffect(
     useCallback(() => {
       fetchDropdownOpts();
+      resetFormData();
     }, [])
   );
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
-      setFormData(JSON.parse(JSON.stringify(initFormData))); // Clear the selected value
+      resetFormData(); // Clear the selected value
     });
     return unsubscribe; // Clean up the listener
   }, [navigation]);
@@ -167,15 +180,36 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
     </View>
   );
 
+  const handleDummyOnAdd = () =>
+    openAlert(
+      [`Thank You, Inventory added successfully with SKU: 2507A01`],
+      0,
+      "",
+      () => {
+        hideModal();
+        console.log("==formdata==", formData);
+        console.log("==initFormData==", initFormData);
+        setFormData(JSON.parse(JSON.stringify(initFormData)));
+        // navigation.navigate("InventoryList");
+      }
+    );
+
   const handleOnAddInventory = async () => {
     startAnimation();
     const invResp = await CallApiPost("createStock", formData);
     if (invResp.respCode === HTTP_STATUS.CREATED) {
-      openAlert(["Thank You, Inventory added successfully"], 0, "", () => {
-        hideModal();
-        setFormData(JSON.parse(JSON.stringify(initFormData)));
-        navigation.navigate("InventoryList");
-      });
+      openAlert(
+        [
+          `Thank You, Inventory added successfully with SKU: ${invResp.respData[0]}`,
+        ],
+        0,
+        "",
+        () => {
+          hideModal();
+          setFormData(JSON.parse(JSON.stringify(initFormData)));
+          navigation.navigate("InventoryList");
+        }
+      );
     } else {
       openAlert([ERR_MSG.E500], -1, "", () => {});
     }
@@ -277,7 +311,8 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
 
         <Button
           mode="contained"
-          onPress={handleOnAddInventory}
+          // onPress={handleOnAddInventory}
+          onPress={handleDummyOnAdd}
           style={styles.addButton}
           labelStyle={styles.buttonLabel}
         >

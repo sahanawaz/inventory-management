@@ -3,7 +3,7 @@ import { Modal, Portal, Text, Icon, Button } from "react-native-paper";
 import { modalStyles } from "../shared/SharedStyles";
 import { COLOR, DEFAULT_THEME_COLOR } from "./SysConsts";
 import { StyleSheet, View } from "react-native";
-import { AlertModalConfig } from "../shared/SharedConstants";
+import { AlertModalConfig } from "../shared/SharedInterface";
 
 const DEFAULT_ERR_ICON = (
   <Icon source="alert-circle-outline" size={48} color={COLOR.DANGER} />

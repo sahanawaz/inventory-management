@@ -1,7 +1,7 @@
 // import { View, StyleSheet, ScrollView } from "react-native";
 // import React from "react";
 import { StackNavigationProp } from "@react-navigation/stack";
-import { RootStackParamList } from "../shared/SharedConstants";
+import { RootStackParamList } from "../shared/SharedInterface";
 // import {
 //   Button,
 //   Card,

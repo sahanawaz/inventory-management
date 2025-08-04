@@ -66,3 +66,18 @@ export interface DropdownOpts {
   colorOpts: SysOpt[];
   dimensionOpts: SysOpt[];
 }
+
+export interface InventoryItemType {
+  inventoryType: string;
+  categoryType: string;
+  sku: string;
+  color: string;
+  dimension: string;
+  unitCp: number;
+  unitSp: number;
+  purchasedQty: number;
+  soldQty: number;
+  avlQnt: number;
+  date: string;
+  particular: string;
+}

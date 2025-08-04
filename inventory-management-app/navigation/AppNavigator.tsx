@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import HomeScreen from "../components/HomeScreen";
 import BillingScreen from "../components/BillingScreen";
 import InventoryScreen from "../components/InventoryScreen";
-import { RootStackParamList } from "../shared/SharedConstants";
+import { RootStackParamList } from "../shared/SharedInterface";
 import GradientBackground from "../utils/GradientBackground";
 import { Platform, View } from "react-native";
 import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
