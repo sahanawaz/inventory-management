@@ -1,5 +1,11 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { View, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Platform,
+  KeyboardAvoidingView,
+} from "react-native";
 import { Text, Button } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import GradientBackground from "../utils/GradientBackground";
@@ -176,6 +182,9 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
         arrowicon={
           <Text style={{ color: DEFAULT_THEME_COLOR, marginLeft: 10 }}>▼</Text>
         }
+        closeicon={
+          <Text style={{ color: DEFAULT_THEME_COLOR, marginLeft: 10 }}>▲</Text>
+        }
       />
     </View>
   );
@@ -217,110 +226,117 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
   };
 
   return (
-    <GradientBackground style={styles.container}>
-      {Loader}
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <TextField
-          label={
-            <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
-              Particular *
-            </Text>
-          }
-          value={formData?.description?.toString()}
-          onChangeHandler={(v: any) => handleChange("description", String(v))}
-        />
-        {/* Dropdowns */}
-        {renderDropdown(
-          "categoryType",
-          "Category Type",
-          dropdownOpts.catTypeOpts
-        )}
-        {renderDropdown(
-          "inventoryType",
-          "Inventory Type",
-          dropdownOpts.invTypeOpts
-        )}
-        {renderDropdown("color", "Color", dropdownOpts.colorOpts)}
-        {renderDropdown("dimension", "Dimension", dropdownOpts.dimensionOpts)}
-
-        {/* Other inputs remain the same as previous implementation */}
-        {/* Cost Price Input */}
-        <TextField
-          label={
-            <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
-              Unit Cost Price *
-            </Text>
-          }
-          value={formData?.unitCp?.toString()}
-          onChangeHandler={(v: any) =>
-            handleChange("unitCp", parseFloat(v) || 0)
-          }
-          keyboardType="numeric"
-        />
-        <TextField
-          label={
-            <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
-              Unit Selling Price *
-            </Text>
-          }
-          value={formData?.unitSp?.toString()}
-          onChangeHandler={(v: any) =>
-            handleChange("unitSp", parseFloat(v) || 0)
-          }
-          keyboardType="numeric"
-        />
-        <TextField
-          label={
-            <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
-              Quantity
-            </Text>
-          }
-          value={formData?.qty?.toString()}
-          onChangeHandler={(v: any) => handleChange("qty", parseFloat(v) || 0)}
-          keyboardType="numeric"
-        />
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Date *</Text>
-          <Button
-            mode="outlined"
-            onPress={() => setShowDatePicker(true)}
-            style={styles.dateButton}
-            icon="calendar"
-            textColor={DEFAULT_THEME_COLOR}
-          >
-            {`${new Date(formData?.date)?.getDate()}-${
-              new Date(formData?.date)?.getMonth() + 1
-            }-${new Date(formData?.date)?.getFullYear()}`}
-          </Button>
-          {showDatePicker && (
-            <DateTimePicker
-              value={new Date(formData?.date)}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
-                if (selectedDate) {
-                  handleChange("date", selectedDate);
-                }
-              }}
-              maximumDate={new Date()}
-            />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <GradientBackground style={styles.container}>
+        {Loader}
+        <ScrollView contentContainerStyle={styles.contentContainer}>
+          <TextField
+            label={
+              <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
+                Particular *
+              </Text>
+            }
+            value={formData?.description?.toString()}
+            onChangeHandler={(v: any) => handleChange("description", String(v))}
+          />
+          {/* Dropdowns */}
+          {renderDropdown(
+            "categoryType",
+            "Category Type",
+            dropdownOpts.catTypeOpts
           )}
-        </View>
+          {renderDropdown(
+            "inventoryType",
+            "Inventory Type",
+            dropdownOpts.invTypeOpts
+          )}
+          {renderDropdown("color", "Color", dropdownOpts.colorOpts)}
+          {renderDropdown("dimension", "Dimension", dropdownOpts.dimensionOpts)}
 
-        <Button
-          mode="contained"
-          // onPress={handleOnAddInventory}
+          {/* Other inputs remain the same as previous implementation */}
+          {/* Cost Price Input */}
+          <TextField
+            label={
+              <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
+                Unit Cost Price *
+              </Text>
+            }
+            value={formData?.unitCp?.toString()}
+            onChangeHandler={(v: any) =>
+              handleChange("unitCp", parseFloat(v) || 0)
+            }
+            keyboardType="numeric"
+          />
+          <TextField
+            label={
+              <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
+                Unit Selling Price *
+              </Text>
+            }
+            value={formData?.unitSp?.toString()}
+            onChangeHandler={(v: any) =>
+              handleChange("unitSp", parseFloat(v) || 0)
+            }
+            keyboardType="numeric"
+          />
+          <TextField
+            label={
+              <Text style={textFieldStyles.sectionTitle} variant="titleMedium">
+                Quantity
+              </Text>
+            }
+            value={formData?.qty?.toString()}
+            onChangeHandler={(v: any) =>
+              handleChange("qty", parseFloat(v) || 0)
+            }
+            keyboardType="numeric"
+          />
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Date *</Text>
+            <Button
+              mode="outlined"
+              onPress={() => setShowDatePicker(true)}
+              style={styles.dateButton}
+              icon="calendar"
+              textColor={DEFAULT_THEME_COLOR}
+            >
+              {`${new Date(formData?.date)?.getDate()}-${
+                new Date(formData?.date)?.getMonth() + 1
+              }-${new Date(formData?.date)?.getFullYear()}`}
+            </Button>
+            {showDatePicker && (
+              <DateTimePicker
+                value={new Date(formData?.date)}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(false);
+                  if (selectedDate) {
+                    handleChange("date", selectedDate);
+                  }
+                }}
+                maximumDate={new Date()}
+              />
+            )}
+          </View>
+
+          <Button
+            mode="contained"
+            // onPress={handleOnAddInventory}
           onPress={handleDummyOnAdd}
-          style={styles.addButton}
-          labelStyle={styles.buttonLabel}
-        >
-          Add Inventory
-        </Button>
-      </ScrollView>
-      {Modal}
-    </GradientBackground>
+            style={styles.addButton}
+            labelStyle={styles.buttonLabel}
+          >
+            Add Inventory
+          </Button>
+        </ScrollView>
+        {Modal}
+      </GradientBackground>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -343,7 +359,8 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     marginBottom: 16,
-    zIndex: 10, // Important for overlapping other elements
+    color: "red",
+    // zIndex: 10, // Important for overlapping other elements
   },
   dropdownBox: {
     backgroundColor: "rgba(255,255,255,0.1)",
@@ -351,9 +368,13 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   dropdownList: {
-    backgroundColor: "rgba(58,58,68,0.95)",
+    backgroundColor: "rgba(58, 58, 68, 1)",
     borderColor: DEFAULT_THEME_COLOR,
     marginTop: 4,
+    position: "absolute",
+    top: 46,
+    width: "100%",
+    zIndex: 20,
   },
   dropdownItem: {
     paddingVertical: 10,
