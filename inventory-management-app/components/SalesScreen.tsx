@@ -1,6 +1,8 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
+  FlatList,
+  ListRenderItemInfo,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
@@ -15,8 +17,9 @@ import { useFocusEffect } from "@react-navigation/native";
 import useAlertModal from "../helper/useAlertModal";
 import useLoader from "../helper/useLoader";
 import { CallApiGet } from "../utils/ServiceHelper";
+import { Bill } from "../shared/SharedInterface";
 const { width, height } = Dimensions.get("window");
-const LedgerScreen = () => {
+const SalesScreen = () => {
   const { showModal, Modal } = useAlertModal();
   const { startAnimation, stopAnimation } = useLoader();
   const [locDate, setLocDate] = useState<{
@@ -41,6 +44,10 @@ const LedgerScreen = () => {
     }, [])
   );
 
+  useEffect(() => {
+    fetchBills(locDate.startDate, locDate.endDate);
+  }, [locDate]);
+
   const totalGrossProfit = () => {
     const totalSp = ledgerData?.reduce(
       (sum, item) => sum + item?.billAmount,
@@ -50,7 +57,7 @@ const LedgerScreen = () => {
       (sum, ledger) => sum + getCostPrice(ledger),
       0
     );
-    return (totalSp - totalCp).toFixed(2);
+    return (totalSp - totalCp)?.toFixed(2);
   };
 
   const fetchBills = async (argStartDt: Date, argEndDt: Date) => {
@@ -130,27 +137,56 @@ const LedgerScreen = () => {
       <View style={styles.priceContainer}>
         <View style={styles.priceItem}>
           <Text style={styles.priceLabel}>Cost</Text>
-          <Text style={styles.costPrice}>₹{cp.toFixed(2)}</Text>
+          <Text style={styles.costPrice}>₹{cp?.toFixed(2)}</Text>
         </View>
 
         <View style={styles.priceItem}>
           <Text style={styles.priceLabel}>Sell</Text>
-          <Text style={styles.sellPrice}>₹{item.billAmount.toFixed(2)}</Text>
+          <Text style={styles.sellPrice}>₹{item.billAmount?.toFixed(2)}</Text>
         </View>
 
         <View style={styles.priceItem}>
           <Text style={styles.priceLabel}>Profit</Text>
           <Text style={styles.profitPrice}>
-            ₹{(item.billAmount - cp).toFixed(2)}
+            ₹{(item.billAmount - cp)?.toFixed(2)}
           </Text>
         </View>
       </View>
     );
   };
+
+  const renderLedger = ({ item }: ListRenderItemInfo<Bill>) => (
+    <TouchableOpacity key={item.id}>
+      <Card style={styles.transactionCard}>
+        <Card.Content>
+          <View style={styles.cardHeader}>
+            <View style={styles.leftSection}>
+              <Text style={styles.productName}>{item?.customerId?.name}</Text>
+              <Text style={styles.skuText}>{item?.customerId?.phone}</Text>
+            </View>
+            <View style={styles.rightSection}>
+              <Text style={styles.dateText}>{item?.billDate}</Text>
+              <Text style={styles.quantityText}>
+                Qty:{" "}
+                {item?.billArr?.reduce(
+                  (sum: number, item: { quantity: number }) =>
+                    sum + item.quantity,
+                  0
+                )}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
+          {renderCostDtls(item)}
+        </Card.Content>
+      </Card>
+    </TouchableOpacity>
+  );
   return (
     <GradientBackground>
       {Modal}
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.content}>
         {/* Summary Card with Vertical Divider */}
         <Card style={styles.summaryCard}>
           <Card.Content>
@@ -181,44 +217,16 @@ const LedgerScreen = () => {
 
         {/* Transaction Cards */}
         <View style={styles.transactionsList}>
-          {ledgerData.map((item, index) => (
-            <TouchableOpacity key={index}>
-              <Card style={styles.transactionCard}>
-                <Card.Content>
-                  <View style={styles.cardHeader}>
-                    <View style={styles.leftSection}>
-                      <Text style={styles.productName}>
-                        {item?.customerId?.name}
-                      </Text>
-                      <Text style={styles.skuText}>
-                        {item?.customerId?.phone}
-                      </Text>
-                    </View>
-                    <View style={styles.rightSection}>
-                      <Text style={styles.dateText}>{item?.billDate}</Text>
-                      <Text style={styles.quantityText}>
-                        Qty:{" "}
-                        {item?.billArr?.reduce(
-                          (sum: number, item: { quantity: number }) =>
-                            sum + item.quantity,
-                          0
-                        )}
-                      </Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.divider} />
-                  {renderCostDtls(item)}
-                </Card.Content>
-              </Card>
-            </TouchableOpacity>
-          ))}
+          <FlatList
+            data={ledgerData}
+            keyExtractor={(item) => item.id}
+            renderItem={renderLedger}
+          />
         </View>
-      </ScrollView>
+      </View>
       {/* Date Picker Modals */}
       {showStartPicker && (
         <DateTimePicker
-          title="Start Date Picker"
           value={locDate.startDate}
           mode="date"
           display="default"
@@ -229,7 +237,6 @@ const LedgerScreen = () => {
 
       {showEndPicker && (
         <DateTimePicker
-          title="End Date Picker"
           value={locDate.endDate}
           mode="date"
           display="default"
@@ -392,4 +399,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LedgerScreen;
+export default SalesScreen;

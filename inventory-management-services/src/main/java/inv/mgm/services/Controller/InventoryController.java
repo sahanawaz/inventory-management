@@ -63,7 +63,7 @@ public class InventoryController {
     }
 
     @PostMapping("/createStock")
-    public ResponseEntity<GenericResponse> createStock(@RequestBody StockEntryModel stockDataModel) {
+    public ResponseEntity<GenericResponse> createStock(@RequestBody List<StockEntryModel> stockDataModel) {
         try {
             List<String> skus = inventoryService.createStock(0,stockDataModel);
             return ResponseEntity.ok(GenericResponse.builder()

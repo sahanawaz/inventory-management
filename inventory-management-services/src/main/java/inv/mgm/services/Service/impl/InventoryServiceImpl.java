@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,29 +92,29 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     /**
-     * @param stockDataModel
+     * @param stockDataModels
      * @return
      */
     @Override
-    public List<String> createStock(Integer userId, StockEntryModel stockDataModel) {
-        List<StockEntryModel> stockEntryModels = new ArrayList<>();
-        stockDataModel = validateStockModel(stockDataModel);
-        stockEntryModels.add(stockDataModel);
-        String stockStr = stockEntryModels.toString();
+    public List<String> createStock(Integer userId, List<StockEntryModel> stockDataModels) {
+        validateStockModel(stockDataModels);
+        String stockStr = stockDataModels.toString();
         logger.info("InventoryService.createStock ---> userId: {}, stockDataModel: {}", userId, stockStr);
 
         return inventoryRepository.saveInventory(userId, stockStr);
     }
 
-    StockEntryModel validateStockModel(StockEntryModel model){
-        if(Objects.nonNull(model.getColor()) && model.getColor() == 0 )
-            model.setColor(null);
-        else if (Objects.nonNull(model.getDimension()) && model.getDimension() == 0 ) {
-            model.setDimension(null);
-        } else if (Objects.nonNull(model.getCategoryType()) && model.getCategoryType() == 0 ) {
-            model.setCategoryType(null);
-        }
-        return model;
+    @Override
+    public void validateStockModel(List<StockEntryModel> modelList){
+        modelList.forEach(model -> {
+            if(Objects.nonNull(model.getColor()) && model.getColor() == 0 )
+                model.setColor(null);
+            else if (Objects.nonNull(model.getDimension()) && model.getDimension() == 0 ) {
+                model.setDimension(null);
+            } else if (Objects.nonNull(model.getCategoryType()) && model.getCategoryType() == 0 ) {
+                model.setCategoryType(null);
+            }
+        });
     }
 
 }

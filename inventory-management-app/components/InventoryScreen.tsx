@@ -3,13 +3,12 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  Platform,
   KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { Text, Button } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import GradientBackground from "../utils/GradientBackground";
-import { SelectList } from "react-native-dropdown-select-list";
 import { DEFAULT_THEME_COLOR, ERR_MSG, HTTP_STATUS } from "../utils/SysConsts";
 import TextField from "../utils/TextField";
 import { textFieldStyles } from "../shared/SharedStyles";
@@ -19,6 +18,7 @@ import useAlertModal from "../helper/useAlertModal";
 import useLoader from "../helper/useLoader";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useFocusEffect } from "@react-navigation/native";
+import Dropdown from "../utils/Dropdown";
 
 type FormData = {
   categoryType: number;
@@ -42,10 +42,10 @@ const initDropdownOpts = {
 };
 
 const initFormData = {
-  categoryType: null,
-  inventoryType: null,
-  color: null,
-  dimension: null,
+  categoryType: 0,
+  inventoryType: 0,
+  color: 0,
+  dimension: 0,
   unitCp: 0,
   unitSp: 0,
   qty: 0,
@@ -53,6 +53,12 @@ const initFormData = {
   description: "",
 };
 
+const initKeys = {
+  catTypeKey: 0,
+  invTypeKey: 0,
+  colorKey: 0,
+  dimensionKey: 0,
+};
 type InventoryScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "Inventory">;
 };
@@ -65,25 +71,25 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
   const [dropdownOpts, setDropdownOpts] = useState<DropdownOpts>(
     JSON.parse(JSON.stringify(initDropdownOpts))
   );
-  const [dropdownRefs, setDropdownRefs] = useState({
-    catTypeDropdown: false,
-    invTypeDropdown: false,
-    colorDropdown: false,
-    dimensionDropdown: false,
-  });
+  const [dropdownRefs, setDropdownRefs] = useState(
+    JSON.parse(JSON.stringify(initKeys))
+  );
   const { showModal, hideModal, Modal } = useAlertModal();
   const { startAnimation, stopAnimation, Loader } = useLoader();
 
   const resetFormData = () => {
     setFormData(JSON.parse(JSON.stringify(initFormData)));
-    // Object.values(dropdownRefs).forEach((ref) =>
-    //   ref.current?.setSelected(null)
-    // );
+    let copyKeys = JSON.parse(JSON.stringify(initKeys));
+    copyKeys.catTypeKey = copyKeys.catTypeKey + 1;
+    copyKeys.invTypeKey = copyKeys.invTypeKey + 1;
+    copyKeys.colorKey = copyKeys.colorKey + 1;
+    copyKeys.dimensionKey = copyKeys.dimensionKey + 1;
+    setDropdownRefs({ ...copyKeys });
   };
+
   useFocusEffect(
     useCallback(() => {
       fetchDropdownOpts();
-      resetFormData();
     }, [])
   );
 
@@ -161,13 +167,18 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
   const renderDropdown = (
     field: FormDataKeys,
     label: string,
-    options: Array<{ key: number; value: string }>
+    options: Array<{ key: number; value: string }>,
+    key: any
   ) => (
     <View style={styles.dropdownContainer}>
       <Text style={[styles.label, { color: DEFAULT_THEME_COLOR }]}>
         {label} *
       </Text>
-      <SelectList
+      <Dropdown
+        txtValue={
+          options.find((opt) => opt.key === formData[field])?.value || ""
+        }
+        key={key}
         data={options}
         setSelected={(val: number) => handleSelect(field, val)}
         search={true}
@@ -179,6 +190,7 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
         inputStyles={styles.inputText}
         searchPlaceholder={`Search ${label.toLowerCase()}...`}
         searchicon={<Text style={{ marginRight: 10 }}>🔍</Text>}
+        save="key"
         arrowicon={
           <Text style={{ color: DEFAULT_THEME_COLOR, marginLeft: 10 }}>▼</Text>
         }
@@ -198,14 +210,14 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
         hideModal();
         console.log("==formdata==", formData);
         console.log("==initFormData==", initFormData);
-        setFormData(JSON.parse(JSON.stringify(initFormData)));
+        resetFormData();
         // navigation.navigate("InventoryList");
       }
     );
 
   const handleOnAddInventory = async () => {
     startAnimation();
-    const invResp = await CallApiPost("createStock", formData);
+    const invResp = await CallApiPost("createStock", [formData]);
     if (invResp.respCode === HTTP_STATUS.CREATED) {
       openAlert(
         [
@@ -215,7 +227,7 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
         "",
         () => {
           hideModal();
-          setFormData(JSON.parse(JSON.stringify(initFormData)));
+          resetFormData();
           navigation.navigate("InventoryList");
         }
       );
@@ -226,12 +238,11 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <GradientBackground style={styles.container}>
-        {Loader}
+    <GradientBackground style={styles.container}>
+      {Loader}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
         <ScrollView contentContainerStyle={styles.contentContainer}>
           <TextField
             label={
@@ -246,15 +257,27 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
           {renderDropdown(
             "categoryType",
             "Category Type",
-            dropdownOpts.catTypeOpts
+            dropdownOpts.catTypeOpts,
+            dropdownRefs.catTypeKey
           )}
           {renderDropdown(
             "inventoryType",
             "Inventory Type",
-            dropdownOpts.invTypeOpts
+            dropdownOpts.invTypeOpts,
+            dropdownRefs.invTypeKey
           )}
-          {renderDropdown("color", "Color", dropdownOpts.colorOpts)}
-          {renderDropdown("dimension", "Dimension", dropdownOpts.dimensionOpts)}
+          {renderDropdown(
+            "color",
+            "Color",
+            dropdownOpts.colorOpts,
+            dropdownRefs.colorKey
+          )}
+          {renderDropdown(
+            "dimension",
+            "Dimension",
+            dropdownOpts.dimensionOpts,
+            dropdownRefs.dimensionKey
+          )}
 
           {/* Other inputs remain the same as previous implementation */}
           {/* Cost Price Input */}
@@ -327,16 +350,17 @@ const InventoryScreen: React.FC<InventoryScreenProps> = ({ navigation }) => {
           <Button
             mode="contained"
             // onPress={handleOnAddInventory}
-          onPress={handleDummyOnAdd}
+            onPress={handleOnAddInventory}
             style={styles.addButton}
             labelStyle={styles.buttonLabel}
           >
             Add Inventory
           </Button>
         </ScrollView>
-        {Modal}
-      </GradientBackground>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+
+      {Modal}
+    </GradientBackground>
   );
 };
 

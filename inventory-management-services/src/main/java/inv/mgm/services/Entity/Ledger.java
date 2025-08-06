@@ -40,6 +40,8 @@ public class Ledger {
 
     private Integer stampUser;
 
+    @Column
+    private Double additionalCharges;
     @OneToMany(mappedBy = "ledger", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<BillDtls> billArr;

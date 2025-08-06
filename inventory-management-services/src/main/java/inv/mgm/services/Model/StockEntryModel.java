@@ -19,6 +19,7 @@ public class StockEntryModel {
     private Integer qty;
     private String date;
     private String description;
+    private String sku;
 
     @Override
     public String toString() {

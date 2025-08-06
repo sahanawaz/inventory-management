@@ -138,16 +138,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             </Card>
           </TouchableOpacity>
           {/* Ledger */}
-          <TouchableOpacity onPress={() => navigation.navigate("Ledger")}>
+          <TouchableOpacity onPress={() => navigation.navigate("Sales")}>
             <Card style={styles.actionCard}>
               <Card.Content style={styles.actionCardContent}>
                 <MaterialIcons
                   name="menu-book"
                   size={48}
                   color="#d4af37"
-                  onPress={() => navigation.navigate("Ledger")}
+                  onPress={() => navigation.navigate("Sales")}
                 />
-                <Text style={styles.actionCardTitle}>Ledger</Text>
+                <Text style={styles.actionCardTitle}>Sales</Text>
               </Card.Content>
             </Card>
           </TouchableOpacity>

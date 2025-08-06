@@ -15,5 +15,7 @@ public interface InventoryService {
 
     List<StockDataModel> getStockBySku(String sku);
 
-    List<String> createStock(Integer userId,StockEntryModel stockDataModel);
+    List<String> createStock(Integer userId,List<StockEntryModel> stockDataModel);
+
+    void validateStockModel(List<StockEntryModel> modelList);
 }
