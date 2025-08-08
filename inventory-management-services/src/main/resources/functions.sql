@@ -62,14 +62,20 @@ $function$
 
 -- DROP FUNCTION public.fn_inventory_save(int4, jsonb);
 
-CREATE OR REPLACE FUNCTION public.fn_inventory_save(arguserid integer, argdata jsonb)
- RETURNS TABLE(sku character varying)
- LANGUAGE plpgsql
-AS $function$
+CREATE OR REPLACE FUNCTION public.fn_inventory_save(
+	arguserid integer,
+	argdata jsonb)
+    RETURNS TABLE(sku character varying)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
 BEGIN
-
+	RETURN QUERY
 	WITH t_inv_info AS (
-        SELECT * FROM jsonb_to_recordset(argdata)
+        SELECT info_data.*, ic.id category_id, i.id inventory_id FROM jsonb_to_recordset(argdata)
         AS info_data(
             "categoryType" Integer,
             "inventoryType" integer,
@@ -79,63 +85,46 @@ BEGIN
             "unitSp" numeric(10,2),
             "qty" integer,
             "date" date,
-			"description" varchar
+			"description" varchar,
+			"sku" varchar
         )
+		LEFT JOIN inventory_category ic
+            ON ic.category_type = info_data."categoryType"
+            AND ic.color = info_data."color"
+            AND ic.dimension = info_data."dimension"
+		LEFT JOIN inventory i
+			ON i.inventory_type = info_data."inventoryType"
+			AND i.inventory_desc = info_data."description"
+			AND i.unit_cp = info_data."unitCp"
+			AND i.unit_sp = info_data."unitSp"
     ),
-    t_data AS (
-        SELECT vi.*, ic.id AS category_id
-        FROM t_inv_info vi
-        LEFT JOIN inventory_category ic
-            ON ic.category_type = vi."categoryType"
-            AND ic.color = vi."color"
-            AND ic.dimension = vi."dimension"
-    )
-    INSERT INTO inventory_category
-    (stamp_date, stamp_user, category_type, color, dimension)
-    SELECT now(), arguserid, td."categoryType", td.color, td.dimension
-    FROM t_data td
-    WHERE td.category_id IS NULL;
-
-    RETURN QUERY
-    WITH t_inv_info AS (
-        SELECT * FROM jsonb_to_recordset(argdata)
-        AS info_data(
-            "categoryType" Integer,
-            "inventoryType" integer,
-            "color" integer,
-            "dimension" Integer,
-            "unitCp" numeric(10,2),
-            "unitSp" numeric(10,2),
-            "qty" integer,
-            "date" date,
-			"description" varchar
-        )
-    ),
-    t_data2 AS (
-        SELECT vi.*, ic.id AS category_id
-        FROM t_inv_info vi
-        LEFT JOIN inventory_category ic
-            ON ic.category_type = vi."categoryType"
-            AND ic.color = vi."color"
-            AND ic.dimension = vi."dimension"
-    ),
+    t_ins_category AS (
+		INSERT INTO inventory_category
+	    (stamp_date, stamp_user, category_type, color, dimension)
+	    SELECT DISTINCT now(), arguserid, td."categoryType", td.color, td.dimension
+	    FROM t_inv_info td
+	    WHERE td.category_id IS NULL
+		RETURNING id, category_type, color, dimension
+	),
     t_ins_inv AS (
         INSERT INTO inventory
         ("date", stamp_date, stamp_user, unit_cp, unit_sp, inventory_type,inventory_desc)
-        SELECT td.date, now(), arguserid, td."unitCp", td."unitSp", td."inventoryType",td."description"
-        FROM t_data2 td
-        RETURNING id
-    ),
-    t_ins_inv_info AS (
-        INSERT INTO inventory_info
-        (inventory_sku, purchased_quantity, sold_quantity, stamp_date, stamp_user, category_id, inventory_id)
-        SELECT fn_sys_generate_code(), td."qty", 0, now(), arguserid, td.category_id, ti.id
-        FROM t_data2 td
-        FULL JOIN t_ins_inv ti ON true
-	--	FULL JOIN t_ins_category tc ON true
-        RETURNING inventory_sku
+        SELECT DISTINCT td.date, now(), arguserid, td."unitCp", td."unitSp", td."inventoryType",td."description"
+        FROM t_inv_info td
+		WHERE td.inventory_id IS NULL
+        RETURNING id, unit_cp, unit_sp, inventory_type,inventory_desc
     )
-    SELECT inventory_sku FROM t_ins_inv_info;
+	INSERT INTO inventory_info
+	(inventory_sku, purchased_quantity, sold_quantity, stamp_date, stamp_user, category_id, inventory_id)
+	SELECT
+		CASE WHEN td."sku" IS NULL OR LENGTH(td."sku") = 0 THEN fn_sys_generate_code() ELSE td."sku" END,
+		td."qty", 0, now(), arguserid, COALESCE(td.category_id, tic.id, 0), COALESCE(td.inventory_id, ti.id, 0)
+	FROM t_inv_info td
+	LEFT JOIN t_ins_inv ti
+		ON ti.unit_sp = td."unitSp" AND ti.unit_cp = td."unitCp"
+		AND ti.inventory_type = td."inventoryType" AND ti.inventory_desc = td."description"
+	LEFT JOIN t_ins_category tic
+		ON tic.color = td.color AND tic.dimension = td.dimension AND tic.category_type = td."categoryType"
+	RETURNING inventory_sku;
 END;
-$function$
-;
+$BODY$;

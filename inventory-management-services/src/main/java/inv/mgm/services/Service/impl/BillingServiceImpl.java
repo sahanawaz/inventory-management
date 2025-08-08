@@ -42,6 +42,7 @@ public class BillingServiceImpl implements BillingService {
         ledger.setBillDate(LocalDate.now());
         ledger.setStampUser(0);
         ledger.setDiscountAmount(billModel.getDiscount());
+        ledger.setAdditionalCharges(billModel.getExtraCharges());
         ledger.setTaxAmount(0.0);
         ledger.setTaxPercent(0.0);
         //set bill details
@@ -49,7 +50,7 @@ public class BillingServiceImpl implements BillingService {
         List<BillDtls> bills = new ArrayList<>();
         for(BillModel billItem : billModel.getBillArr()) {
             BillDtls billDtls = new BillDtls();
-            billDtls.setAmount(billItem.getAmount());
+            billDtls.setAmount(billItem.getQty() * billItem.getUnitSp());
             billDtls.setInfo("");
             billDtls.setParticulars(billItem.getParticulars());
             billDtls.setStampUser(0);
@@ -66,7 +67,7 @@ public class BillingServiceImpl implements BillingService {
             billDtls.setLedger(ledger);
             bills.add(billDtls);
         }
-        ledger.setBillAmount(totalAmount - billModel.getDiscount());
+        ledger.setBillAmount(totalAmount + billModel.getExtraCharges() - billModel.getDiscount());
         ledger.setBillArr(bills);
 
         return billingRepository.save(ledger);

@@ -136,17 +136,17 @@ const SalesScreen = () => {
     return (
       <View style={styles.priceContainer}>
         <View style={styles.priceItem}>
-          <Text style={styles.priceLabel}>Cost</Text>
+          <Text style={styles.priceLabel}>COGS</Text>
           <Text style={styles.costPrice}>₹{cp?.toFixed(2)}</Text>
         </View>
 
         <View style={styles.priceItem}>
-          <Text style={styles.priceLabel}>Sell</Text>
+          <Text style={styles.priceLabel}>SALES</Text>
           <Text style={styles.sellPrice}>₹{item.billAmount?.toFixed(2)}</Text>
         </View>
 
         <View style={styles.priceItem}>
-          <Text style={styles.priceLabel}>Profit</Text>
+          <Text style={styles.priceLabel}>PROFIT</Text>
           <Text style={styles.profitPrice}>
             ₹{(item.billAmount - cp)?.toFixed(2)}
           </Text>
@@ -219,7 +219,7 @@ const SalesScreen = () => {
         <View style={styles.transactionsList}>
           <FlatList
             data={ledgerData}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => String(item.id)}
             renderItem={renderLedger}
           />
         </View>

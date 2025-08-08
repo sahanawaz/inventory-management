@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Button,
   Chip,
@@ -11,13 +11,21 @@ import {
 import { modalStyles } from "../shared/SharedStyles";
 import { StyleSheet, View } from "react-native";
 import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
+import { AdnlChgClass } from "../shared/SharedInterface";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface DiscountProps {
   visible: boolean;
   totalAmount: number;
   hideModal(): void;
-  handleOnSubmit(discount: number): void;
+  handleOnSubmit(adnlChg: AdnlChgClass): void;
 }
+
+export const initAdnlChg = {
+  discount: 0.0,
+  extraCharges: 0.0,
+  deductions: 0.0,
+};
 
 const DiscountModal: React.FC<DiscountProps> = ({
   visible,
@@ -25,22 +33,43 @@ const DiscountModal: React.FC<DiscountProps> = ({
   totalAmount,
   handleOnSubmit,
 }) => {
-  const [discount, setDiscount] = useState<number>(0.0);
+  const [adnlChg, setAdnlChg] = useState<AdnlChgClass>(
+    JSON.parse(JSON.stringify(initAdnlChg))
+  );
   const [isChip, setChip] = useState<boolean>(false);
 
-  const onChangeTextHandler = (value: number) => {
-    setDiscount(value);
+  useFocusEffect(
+    useCallback(() => {
+      setAdnlChg(JSON.parse(JSON.stringify(initAdnlChg)));
+    }, [])
+  );
+
+  const onChangeTextHandler = (key: string, value: number) => {
+    setAdnlChg({ ...adnlChg, [key]: value });
+  };
+  const calculateFinalAmt = () => {
+    return (
+      totalAmount +
+        adnlChg.extraCharges -
+        adnlChg.deductions -
+        adnlChg.discount || 0
+    ).toFixed(2);
   };
   const onSubmit = () => {
     const maxAllowedDiscount = totalAmount * 0.2;
-    if (discount > maxAllowedDiscount) {
+    if (adnlChg.discount > maxAllowedDiscount) {
       setChip(true);
       setTimeout(() => setChip(false), 4000);
       return;
     } else {
-      handleOnSubmit(discount);
+      handleOnSubmit(adnlChg);
     }
   };
+  const handleOnHide = () => {
+    setAdnlChg(JSON.parse(JSON.stringify(initAdnlChg)));
+    hideModal();
+  };
+
   return (
     <Portal>
       <Modal
@@ -54,7 +83,7 @@ const DiscountModal: React.FC<DiscountProps> = ({
             <IconButton
               icon="close" // You can use other icons like "close-circle"
               size={24}
-              onPress={hideModal}
+              onPress={handleOnHide}
               style={modalStyles.closeButton}
             />
           </View>
@@ -68,21 +97,43 @@ const DiscountModal: React.FC<DiscountProps> = ({
 
             <TextInput
               label="Discount"
-              value={discount?.toString()}
-              onChangeText={(v) => onChangeTextHandler(parseFloat(v) || 0)}
+              value={adnlChg?.discount > 0 ? adnlChg?.discount?.toString() : ""}
+              onChangeText={(v) =>
+                onChangeTextHandler("discount", parseFloat(v) || 0)
+              }
               keyboardType="numeric"
               style={modalStyles.input}
             />
+            <TextInput
+              label="Extra Charges"
+              value={
+                adnlChg?.extraCharges > 0
+                  ? adnlChg?.extraCharges?.toString()
+                  : ""
+              }
+              onChangeText={(v) =>
+                onChangeTextHandler("extraCharges", parseFloat(v) || 0)
+              }
+              keyboardType="numeric"
+              style={modalStyles.input}
+            />
+            {/* <TextInput
+              label="Deductions"
+              value={adnlChg?.deductions?.toString()}
+              onChangeText={(v) =>
+                onChangeTextHandler("deductions", parseFloat(v) || 0)
+              }
+              keyboardType="numeric"
+              style={modalStyles.input}
+            /> */}
             <View style={styles.amountContainer}>
               <Text style={styles.amountLabel}>Total Amount:</Text>
               <Text style={styles.amountValue}>₹{totalAmount.toFixed(2)}</Text>
             </View>
 
             <View style={styles.amountContainer}>
-              <Text style={styles.amountLabel}>After Discount:</Text>
-              <Text style={styles.amountValue}>
-                ₹{(totalAmount - discount || 0).toFixed(2)}
-              </Text>
+              <Text style={styles.amountLabel}>Final Amount:</Text>
+              <Text style={styles.amountValue}>₹{calculateFinalAmt()}</Text>
             </View>
             <Button
               mode="contained"

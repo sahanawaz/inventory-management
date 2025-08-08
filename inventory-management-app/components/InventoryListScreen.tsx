@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import GradientBackground from "../utils/GradientBackground";
-import { Card, DataTable, Text } from "react-native-paper";
+import { Card, DataTable, IconButton, Text } from "react-native-paper";
 import { ledgerData } from "../utils/SysData";
 import { DEFAULT_THEME_COLOR, ERR_MSG, months } from "../utils/SysConsts";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -18,10 +18,13 @@ import { useFocusEffect } from "@react-navigation/native";
 import useAlertModal from "../helper/useAlertModal";
 import useLoader from "../helper/useLoader";
 import { CallApiGet, CallApiPost } from "../utils/ServiceHelper";
-import { InventoryItemType } from "../shared/SharedInterface";
+import { InventoryItemType, SkuClass } from "../shared/SharedInterface";
+import FilterSkuModal from "./FilterSkuModal";
 const { width, height } = Dimensions.get("window");
-const LedgerScreen = () => {
+
+const InventoryListScreen = () => {
   const { showModal, Modal } = useAlertModal();
+  const [openFilter, setOpenFilter] = useState(false);
   const { startAnimation, stopAnimation } = useLoader();
   const [locDate, setLocDate] = useState<{
     startDate: Date;
@@ -45,6 +48,11 @@ const LedgerScreen = () => {
     }, [])
   );
 
+  const showFilterModal = () => setOpenFilter(true);
+  const hideFilterModal = () => {
+    setOpenFilter(false);
+  };
+
   const getQtyToRender = (qtyType: "T" | "A") => {
     switch (qtyType) {
       case "T":
@@ -57,7 +65,11 @@ const LedgerScreen = () => {
     }
   };
 
-  const fetchInventory = async (argStartDt: Date, argEndDt: Date) => {
+  const fetchInventory = async (
+    argStartDt: Date,
+    argEndDt: Date,
+    argFilter: any = null
+  ) => {
     startAnimation();
     const reqStartDt = `${argStartDt.getFullYear()}-${(
       argStartDt.getMonth() + 1
@@ -67,10 +79,14 @@ const LedgerScreen = () => {
     const reqEndDt = `${argEndDt.getFullYear()}-${(argEndDt.getMonth() + 1)
       .toString()
       .padStart(2, "0")}-${argEndDt.getDate().toString().padStart(2, "0")}`;
-    const ledgerResp = await CallApiPost("getStocks", {
+    let payload = {
       fromDt: reqStartDt,
       toDt: reqEndDt,
-    });
+    };
+    if (!!argFilter) {
+      payload = { ...argFilter };
+    }
+    const ledgerResp = await CallApiPost("getStocks", payload);
     if (ledgerResp.respCode === 200) {
       setInventoryList(ledgerResp.respData);
     } else {
@@ -134,7 +150,11 @@ const LedgerScreen = () => {
     return (
       <View style={styles.priceContainer}>
         <View style={styles.priceItem}>
-          <Text style={styles.priceLabel}>Unit SP</Text>
+          <Text style={styles.priceLabel}>CP</Text>
+          <Text style={styles.costPrice}>₹{item?.unitCp?.toFixed(2)}</Text>
+        </View>
+        <View style={styles.priceItem}>
+          <Text style={styles.priceLabel}>SP</Text>
           <Text style={styles.costPrice}>₹{item?.unitSp?.toFixed(2)}</Text>
         </View>
 
@@ -178,6 +198,11 @@ const LedgerScreen = () => {
       </Card>
     </TouchableOpacity>
   );
+
+  const handleOnFilter = (argFilter: SkuClass) => {
+    fetchInventory(locDate.startDate, locDate.endDate, argFilter);
+  };
+
   return (
     <GradientBackground>
       {Modal}
@@ -197,8 +222,20 @@ const LedgerScreen = () => {
                 <Text style={styles.tapHint}>Tap to change dates</Text>
               </TouchableOpacity>
 
-              {/* Vertical Divider */}
-              <View style={styles.verticalDivider} />
+              <View style={styles.verticalStack}>
+                {/* Vertical Divider */}
+                <View style={styles.verticalDivider} />
+                {/* Filter Icon */}
+                <IconButton
+                  icon="filter" // Use the filter icon
+                  size={24} // Adjust size as needed
+                  onPress={showFilterModal}
+                  style={styles.filterIcon}
+                  iconColor={DEFAULT_THEME_COLOR} // Optional styling for the icon
+                />
+                {/* Vertical Divider */}
+                <View style={styles.verticalDivider} />
+              </View>
 
               {/* Gross Profit Section */}
               <View style={styles.profitSection}>
@@ -240,6 +277,11 @@ const LedgerScreen = () => {
           maximumDate={new Date()}
         />
       )}
+      <FilterSkuModal
+        visible={openFilter}
+        hideModal={hideFilterModal}
+        handleOnFilter={handleOnFilter}
+      />
     </GradientBackground>
   );
 };
@@ -271,21 +313,36 @@ const styles = StyleSheet.create({
   summaryContainer: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 8,
+    // paddingVertical: 4,
   },
   dateSection: {
     flex: 1,
     alignItems: "center",
+    paddingVertical: 4,
   },
   profitSection: {
     flex: 1,
     alignItems: "center",
+    paddingVertical: 4,
+  },
+  verticalStack: {
+    flexDirection: "column", // Vertical layout for divider and icon
+    justifyContent: "center",
+    alignItems: "center",
+    height: 75, // Match parent height
+    paddingHorizontal: 8, // Add spacing as needed
   },
   verticalDivider: {
     width: 1,
-    height: 60,
+    height: 15,
     backgroundColor: DEFAULT_THEME_COLOR,
     marginHorizontal: 20,
+  },
+  filterIcon: {
+    // Optional styles for the filter icon
+    alignSelf: "center", // Center the icon horizontally
+    marginVertical: 0,
+    paddingVertical: 0, // Add vertical margin if needed
   },
   sectionLabel: {
     color: DEFAULT_THEME_COLOR,
@@ -394,4 +451,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LedgerScreen;
+export default InventoryListScreen;

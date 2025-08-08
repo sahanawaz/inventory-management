@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { Button, Card, Icon, Text } from "react-native-paper";
 import {
+  AdnlChgClass,
   AlertModalConfig,
   BillClass,
   CustBillClass,
@@ -16,7 +17,7 @@ import {
   initlAlertConfig,
 } from "../utils/SysConsts";
 import AddSkuModal from "./AddSkuModal";
-import DiscountModal from "./DiscountModal";
+import DiscountModal, { initAdnlChg } from "./DiscountModal";
 import AlertModal from "../utils/AlertModal";
 import { textFieldStyles } from "../shared/SharedStyles";
 import { CallApiGet, CallApiPost } from "../utils/ServiceHelper";
@@ -39,7 +40,7 @@ const initCustBillObj = {
 
 const initDiscountObj = {
   visible: false,
-  discount: 0,
+  adnlChg: JSON.parse(JSON.stringify(initAdnlChg)),
 };
 
 type BillingScreenNavigationProp = {
@@ -77,20 +78,24 @@ const BillingScreen: React.FC<BillingScreenNavigationProp> = ({
     startAnimation();
     const respSku = await CallApiGet(`getStockBySku?sku=${argBillObj.sku}`);
     console.log(respSku);
-    if (respSku.respCode === 200 && respSku.respData?.length > 0) {
-      let copyBillArr = [...billObj.billArr];
-      let data = respSku.respData[0];
-      let itemIndex = copyBillArr.findIndex(
-        (prdt) => prdt.sku === argBillObj.sku
-      );
-      if (itemIndex > -1) {
-        copyBillArr[itemIndex].qty =
-          +copyBillArr[itemIndex].qty + +argBillObj.qty;
+    if (respSku.respCode === 200) {
+      if (respSku.respData?.length > 0) {
+        let copyBillArr = [...billObj.billArr];
+        let data = respSku.respData[0];
+        let itemIndex = copyBillArr.findIndex(
+          (prdt) => prdt.sku === argBillObj.sku
+        );
+        if (itemIndex > -1) {
+          copyBillArr[itemIndex].qty =
+            +copyBillArr[itemIndex].qty + +argBillObj.qty;
+        } else {
+          data.qty = argBillObj.qty;
+          copyBillArr.push(data);
+        }
+        setBiillObj({ ...billObj, billArr: [...copyBillArr] });
       } else {
-        data.qty = argBillObj.qty;
-        copyBillArr.push(data);
+        openAlert(["Wrong SKU!!"], -1, "");
       }
-      setBiillObj({ ...billObj, billArr: [...copyBillArr] });
     } else {
       openAlert([ERR_MSG.E500], -1, "");
     }
@@ -109,13 +114,13 @@ const BillingScreen: React.FC<BillingScreenNavigationProp> = ({
 
   // Calculate total selling price
   const calculateTotalSP = (qty: number, unitSp: Double) => {
-    return (qty * unitSp).toFixed(2);
+    return (qty * unitSp)?.toFixed(2);
   };
 
   const calculateFinalSP = (argBill = billObj.billArr) => {
     return argBill
       .reduce((acc, curr) => acc + curr.qty * curr.unitSp, 0)
-      .toFixed(2);
+      ?.toFixed(2);
   };
 
   const onDelete = (id: number) => {
@@ -124,14 +129,17 @@ const BillingScreen: React.FC<BillingScreenNavigationProp> = ({
     setBiillObj({ ...billObj, billArr: [...copyBillArr] });
     console.log(Number(calculateFinalSP()));
     if (Number(calculateFinalSP(copyBillArr)) <= 0.0) {
-      setAppliedDiscount({ ...appliedDiscount, discount: 0 });
+      setAppliedDiscount({
+        ...appliedDiscount,
+        adnlChg: JSON.parse(JSON.stringify(initAdnlChg)),
+      });
     }
   };
 
-  const handleDiscount = (argDiscount: number) => {
+  const handleDiscount = (argAdnlChg: AdnlChgClass) => {
     setAppliedDiscount({
       visible: false,
-      discount: argDiscount,
+      adnlChg: argAdnlChg,
     });
   };
 
@@ -179,7 +187,8 @@ const BillingScreen: React.FC<BillingScreenNavigationProp> = ({
 
   const processBill = async () => {
     if (isDataValid()) {
-      billObj.discount = appliedDiscount.discount;
+      billObj.discount = appliedDiscount.adnlChg.discount;
+      billObj.extraCharges = appliedDiscount.adnlChg.extraCharges;
       startAnimation();
       const saveResp = await CallApiPost("createBill", billObj);
       if (saveResp.respCode === 200) {
@@ -195,6 +204,13 @@ const BillingScreen: React.FC<BillingScreenNavigationProp> = ({
       }
       stopAnimation();
     }
+  };
+
+  const isSubTotalVisible = () => {
+    return (
+      appliedDiscount.adnlChg.discount > 0 ||
+      appliedDiscount.adnlChg.extraCharges > 0
+    );
   };
 
   return (
@@ -286,22 +302,30 @@ const BillingScreen: React.FC<BillingScreenNavigationProp> = ({
       <AlertModal
         config={alertConfig}
         onDismiss={closeAlert}
-        onOk={() => navigation.navigate("Ledger")}
+        onOk={() => navigation.navigate("Sales")}
       />
       {/* Combined Discount Button and Totals Row */}
       <View style={styles.discountTotalRow}>
         <View style={styles.totalContainer}>
-          {appliedDiscount.discount > 0 && (
+          {isSubTotalVisible() && (
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Subtotal:</Text>
               <Text style={styles.totalValue}>₹{calculateFinalSP()}</Text>
             </View>
           )}
-          {appliedDiscount.discount > 0 && (
+          {appliedDiscount.adnlChg.extraCharges > 0 && (
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Extra Charges:</Text>
+              <Text style={styles.extChgText}>
+                ₹{appliedDiscount.adnlChg.extraCharges?.toFixed(2)}
+              </Text>
+            </View>
+          )}
+          {appliedDiscount.adnlChg.discount > 0 && (
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Discount:</Text>
               <Text style={styles.discountText}>
-                - ₹{appliedDiscount.discount.toFixed(2)}
+                - ₹{appliedDiscount.adnlChg.discount?.toFixed(2)}
               </Text>
             </View>
           )}
@@ -309,22 +333,28 @@ const BillingScreen: React.FC<BillingScreenNavigationProp> = ({
             <Text style={styles.grandTotalLabel}>Total:</Text>
             <Text style={styles.grandTotalValue}>
               ₹
-              {(Number(calculateFinalSP()) - appliedDiscount.discount).toFixed(
-                2
-              )}
+              {(
+                Number(calculateFinalSP()) +
+                appliedDiscount.adnlChg.extraCharges -
+                appliedDiscount.adnlChg.discount
+              )?.toFixed(2)}
             </Text>
           </View>
         </View>
-        <Button
-          mode="outlined"
-          style={styles.discountButton}
-          labelStyle={styles.discountButtonLabel}
-          onPress={() =>
-            setAppliedDiscount({ ...appliedDiscount, visible: true })
-          }
-        >
-          {appliedDiscount.discount > 0 ? "Change Discount" : "Add Discount"}
-        </Button>
+        <View style={{ width: "35%" }}>
+          <Button
+            mode="outlined"
+            style={styles.discountButton}
+            labelStyle={styles.discountButtonLabel}
+            onPress={() =>
+              setAppliedDiscount({ ...appliedDiscount, visible: true })
+            }
+          >
+            {appliedDiscount.adnlChg.discount > 0
+              ? "Change Discount"
+              : "Add Discount"}
+          </Button>
+        </View>
       </View>
 
       <Button
@@ -349,7 +379,7 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    padding: 16,
+    padding: 10,
     paddingBottom: 32,
   },
 
@@ -487,6 +517,7 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontSize: 14,
   },
+  extChgText: { color: "#82b74b", fontSize: 14 },
   discountText: {
     color: "#e74c3c",
     fontSize: 14,

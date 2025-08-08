@@ -25,11 +25,17 @@ public class InventoryServiceImpl implements InventoryService {
      */
     @Override
     public Map<String,List<InventoryStockModel>> getAllStocks(SkuFilterDto filterDto) {
-        // Fetch all inventory stocks from the repository
-//        .orElseThrow(() -> new RuntimeException("Product not found"))
-        List<InventoryInfo> stocks = inventoryRepository.findInventoryWherePurchasedGreaterThanSold(
-                filterDto.fromDt.orElse(LocalDate.now().minusDays(7)), filterDto.toDt.orElse(LocalDate.now())
-        );
+
+        List<InventoryInfo> stocks = new ArrayList<>();
+        if (filterDto.fromDt.isPresent() && filterDto.toDt.isPresent() && filterDto.sku.isEmpty())
+            stocks = inventoryRepository.findInventoryWherePurchasedGreaterThanSold(
+                    filterDto.fromDt.orElse(LocalDate.now().minusDays(7)),
+                    filterDto.toDt.orElse(LocalDate.now()),
+                    filterDto.sku.orElse(null)
+                );
+        else if (filterDto.sku.isPresent()) {
+            stocks = inventoryRepository.findByInventorySku(filterDto.sku.toString());
+        }
 
         Map<Object, List<InventoryInfo>> grp = stocks.parallelStream()
                 .collect(Collectors.groupingBy(a->a.getCategory().getCategoryType().getOptionValue()));
@@ -60,9 +66,16 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     public List<InventoryStockModel> getAllStocksByDateRange(SkuFilterDto filterDto) {
-        List<InventoryInfo> stocks = inventoryRepository.findInventoryWherePurchasedGreaterThanSold(
-                filterDto.fromDt.orElse(LocalDate.now().minusDays(7)), filterDto.toDt.orElse(LocalDate.now())
-        );
+        List<InventoryInfo> stocks = new ArrayList<>();
+        if (filterDto.fromDt.isPresent() && filterDto.toDt.isPresent() && filterDto.sku.isEmpty()) {
+            stocks = inventoryRepository.findInventoryWherePurchasedGreaterThanSold(
+                    filterDto.fromDt.orElse(LocalDate.now().minusDays(7)),
+                    filterDto.toDt.orElse(LocalDate.now()),
+                    filterDto.sku.orElse(null)
+            );
+        } else if (filterDto.sku.isPresent()) {
+            stocks = inventoryRepository.findByInventorySku(filterDto.sku.get());
+        }
         return stocks.parallelStream().map(a -> new InventoryStockModel(
                 a.getInventory().getInventoryType().getOptionValue(),
                 a.getCategory().getCategoryType().getOptionValue(),
@@ -85,10 +98,16 @@ public class InventoryServiceImpl implements InventoryService {
     @Override
     public List<StockDataModel> getStockBySku(String sku) {
         logger.info("InventoryService.getStockBySku ---> START");
-        InventoryInfo invt = inventoryRepository.findByInventorySku(sku).get(0);
-        StockDataModel model = new StockDataModel(invt.getId(),invt.getInventorySku(),
-                invt.getInventory().getInventoryDesc(),(invt.getPurchasedQuantity() - invt.getSoldQuantity()),invt.getInventory().getUnitCp(),invt.getInventory().getUnitSp(),0.0);
-        return List.of(model);
+        List<InventoryInfo> invtList = inventoryRepository.findByInventorySku(sku);
+        if (invtList.isEmpty())
+            return Collections.emptyList();
+        else {
+            InventoryInfo invt = invtList.get(0);
+            StockDataModel model = new StockDataModel(invt.getId(),invt.getInventorySku(),
+                    invt.getInventory().getInventoryDesc(),(invt.getPurchasedQuantity() - invt.getSoldQuantity()),invt.getInventory().getUnitCp(),invt.getInventory().getUnitSp(),0.0);
+            return List.of(model);
+        }
+
     }
 
     /**

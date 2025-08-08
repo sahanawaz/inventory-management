@@ -147,6 +147,12 @@ export interface Bill {
   billArr: BillItem[];
 }
 
+export interface AdnlChgClass {
+  discount: number;
+  extraCharges: number;
+  deductions: number;
+}
+
 export interface SelectListProps {
   /**
    * State to accept the selected value

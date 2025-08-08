@@ -19,8 +19,14 @@ public interface InventoryRepository extends JpaRepository<InventoryInfo, Long> 
      @Query(value = "SELECT sku FROM fn_inventory_save(:userId, :inventoryData ::JSONB)",nativeQuery = true)
       List<String> saveInventory(@Param("userId") Integer userId,
                                        @Param("inventoryData") String inventoryData);
-    @Query("SELECT i FROM InventoryInfo i WHERE i.purchasedQuantity > i.soldQuantity AND i.inventory.date BETWEEN :fromDt AND :toDt ORDER BY i.id DESC")
-    List<InventoryInfo> findInventoryWherePurchasedGreaterThanSold(@Param("fromDt") LocalDate fromDt, @Param("toDt") LocalDate toDt);
+    @Query("""
+       SELECT i FROM InventoryInfo i
+       WHERE i.purchasedQuantity >= i.soldQuantity
+        AND i.inventorySku = COALESCE(:sku, i.inventorySku)
+        AND i.inventory.date BETWEEN :fromDt AND :toDt ORDER BY i.id DESC    
+    """)
+    List<InventoryInfo> findInventoryWherePurchasedGreaterThanSold(
+            @Param("fromDt") LocalDate fromDt, @Param("toDt") LocalDate toDt, @Param("sku") String sku);
 
 
 }
