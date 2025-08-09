@@ -1,21 +1,19 @@
 package inv.mgm.services.Model;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-
 public class StockDataModel {
     private Integer invInfoId;
     private String sku;
     private String particulars;
-    private Integer quantity;
+    private Integer qty;
     private Double unitCp;
     private Double unitSp;
     private Double amount;
 
-    public StockDataModel(Integer invInfoId, String sku, String particulars, Integer quantity, Double unitCp, Double unitSp, Double amount) {
+    public StockDataModel(Integer invInfoId, String sku, String particulars, Integer qty, Double unitCp, Double unitSp, Double amount) {
         this.invInfoId = invInfoId;
         this.sku = sku;
         this.particulars = particulars;
-        this.quantity = quantity;
+        this.qty = qty;
         this.unitCp = unitCp;
         this.unitSp = unitSp;
         this.amount = amount;
@@ -48,12 +46,12 @@ public class StockDataModel {
         this.particulars = particulars;
     }
 
-    public Integer getQuantity() {
-        return quantity;
+    public Integer getQty() {
+        return qty;
     }
 
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
+    public void setQty(Integer qty) {
+        this.qty = qty;
     }
 
     public Double getUnitCp() {

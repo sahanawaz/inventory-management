@@ -1,17 +1,16 @@
 package inv.mgm.services.Repository;
 
 
-import inv.mgm.services.Entity.Leadger;
+import inv.mgm.services.Entity.Ledger;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface BillingRepository extends JpaRepository<Leadger, Long> {
+import java.time.LocalDate;
+import java.util.List;
 
-    // Define custom query methods if needed
-    // For example, find by billing date or customer ID
-    // List<Billing> findByBillingDate(Date billingDate);
-    // List<Billing> findByCustomerId(Long customerId);
-    // Inherited from JpaRepository: List<BillingRepository> findAll();
-
+public interface BillingRepository extends JpaRepository<Ledger, Long> {
+    List<Ledger> findByBillDateBetween(LocalDate startDt, LocalDate endDt);
 
 
 }
