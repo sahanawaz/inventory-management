@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -20,6 +20,7 @@ import useLoader from "../helper/useLoader";
 import { CallApiGet, CallApiPost } from "../utils/ServiceHelper";
 import { InventoryItemType, SkuClass } from "../shared/SharedInterface";
 import FilterSkuModal from "./FilterSkuModal";
+import { URL } from "../utils/UrlConstants";
 const { width, height } = Dimensions.get("window");
 
 const InventoryListScreen = () => {
@@ -47,6 +48,10 @@ const InventoryListScreen = () => {
       fetchInventory(lstartDate, lendDate);
     }, [])
   );
+
+  useEffect(() => {
+    fetchInventory(locDate?.startDate, locDate?.endDate);
+  }, [locDate]);
 
   const showFilterModal = () => setOpenFilter(true);
   const hideFilterModal = () => {
@@ -86,7 +91,7 @@ const InventoryListScreen = () => {
     if (!!argFilter) {
       payload = { ...argFilter };
     }
-    const ledgerResp = await CallApiPost("getStocks", payload);
+    const ledgerResp = await CallApiPost(URL.FETCH_INV_LIST, payload);
     if (ledgerResp.respCode === 200) {
       setInventoryList(ledgerResp.respData);
     } else {

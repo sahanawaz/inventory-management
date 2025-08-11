@@ -18,4 +18,6 @@ public interface InventoryService {
     List<String> createStock(Integer userId,List<StockEntryModel> stockDataModel);
 
     void validateStockModel(List<StockEntryModel> modelList);
+
+    InventorySummaryResp getInventorySummary();
 }

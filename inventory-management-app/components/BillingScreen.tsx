@@ -24,6 +24,7 @@ import { CallApiGet, CallApiPost } from "../utils/ServiceHelper";
 import useLoader from "../helper/useLoader";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { useFocusEffect } from "@react-navigation/native";
+import { URL } from "../utils/UrlConstants";
 
 const initCustBillObj = {
   customer: {
@@ -76,7 +77,9 @@ const BillingScreen: React.FC<BillingScreenNavigationProp> = ({
 
   const handleAddSKU = async (argBillObj: BillClass) => {
     startAnimation();
-    const respSku = await CallApiGet(`getStockBySku?sku=${argBillObj.sku}`);
+    const respSku = await CallApiGet(
+      `${URL.FILTER_INV_BY_SKU}${argBillObj.sku}`
+    );
     console.log(respSku);
     if (respSku.respCode === 200) {
       if (respSku.respData?.length > 0) {
@@ -190,7 +193,7 @@ const BillingScreen: React.FC<BillingScreenNavigationProp> = ({
       billObj.discount = appliedDiscount.adnlChg.discount;
       billObj.extraCharges = appliedDiscount.adnlChg.extraCharges;
       startAnimation();
-      const saveResp = await CallApiPost("createBill", billObj);
+      const saveResp = await CallApiPost(URL.CREATE_BILL, billObj);
       if (saveResp.respCode === 200) {
         openAlert(["Thank You, Your bill has been processed."], 0, "");
       } else {

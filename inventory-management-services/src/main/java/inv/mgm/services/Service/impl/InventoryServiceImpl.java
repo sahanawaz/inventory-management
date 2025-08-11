@@ -1,9 +1,6 @@
 package inv.mgm.services.Service.impl;
 import inv.mgm.services.Entity.InventoryInfo;
-import inv.mgm.services.Model.InventoryStockModel;
-import inv.mgm.services.Model.SkuFilterDto;
-import inv.mgm.services.Model.StockDataModel;
-import inv.mgm.services.Model.StockEntryModel;
+import inv.mgm.services.Model.*;
 import inv.mgm.services.Repository.InventoryRepository;
 import inv.mgm.services.Service.InventoryService;
 import org.slf4j.Logger;
@@ -136,4 +133,13 @@ public class InventoryServiceImpl implements InventoryService {
         });
     }
 
+    @Override
+    public InventorySummaryResp getInventorySummary() {
+        logger.info("InventoryServiceImpl.getInventorySummary >>> START");
+        try {
+            return inventoryRepository.getInventorySummary();
+        } catch (Exception ex) {
+            return new InventorySummaryResp(0L, 0L);
+        }
+    }
 }

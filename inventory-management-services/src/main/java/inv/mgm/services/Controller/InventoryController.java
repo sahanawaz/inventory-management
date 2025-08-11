@@ -100,4 +100,14 @@ public class InventoryController {
 
     //if we add multiple stocks at once, then how return the skus?
 
+    @GetMapping("/inventorySummary")
+    public ResponseEntity<GenericResponse> fetchInventorySummary() {
+        logger.info("InventoryController.fetchInventorySummary >>> START");
+        return ResponseEntity.ok(GenericResponse.builder()
+                .respCode(HttpStatus.OK.value())
+                .respMesaage("SUC")
+                .respData(inventoryService.getInventorySummary())
+                .build());
+    }
+
 }

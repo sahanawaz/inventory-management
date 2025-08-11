@@ -11,32 +11,63 @@ import { RootStackParamList } from "../shared/SharedInterface";
 //   Text,
 // } from "react-native-paper";
 
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
   SafeAreaView,
+  ScrollView,
+  RefreshControl,
 } from "react-native";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Card, Text } from "react-native-paper";
 import GradientBackground from "../utils/GradientBackground";
 import { DEFAULT_THEME_COLOR } from "../utils/SysConsts";
 import { CallApiGet } from "../utils/ServiceHelper";
+import { useFocusEffect } from "@react-navigation/native";
+import { URL } from "../utils/UrlConstants";
+import useLoader from "../helper/useLoader";
+import { onRefresh } from "../helper/commonMethods";
 
 type HomeScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "Home">;
 };
 
+type InventorySummaryInterface = {
+  totalQty: number;
+  soldQty: number;
+};
+
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  // Load custom fonts
+  const { startAnimation, stopAnimation } = useLoader();
+  const [refreshing, setRefreshing] = useState(false);
+  const [invSummary, setInvSummary] = useState<InventorySummaryInterface>({
+    totalQty: 0,
+    soldQty: 0,
+  });
 
   // Sample inventory data
-  const inventoryStats = {
-    totalProducts: 158,
-    productsIn: 24,
-    productsOut: 12,
+  // const inventoryStats = {
+  //   totalProducts: 158,
+  //   productsIn: 24,
+  //   productsOut: 12,
+  // };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchInventorySummary();
+    }, [])
+  );
+
+  const fetchInventorySummary = async () => {
+    startAnimation();
+    const resp = await CallApiGet(URL.INV_SUMRY);
+    if (resp.respCode === 200 && !!resp.respData) {
+      setInvSummary(resp.respData);
+    }
+    stopAnimation();
   };
 
   return (
@@ -58,9 +89,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               <View style={styles.statItem}>
                 <MaterialIcons name="inventory" size={32} color="#d4af37" />
                 <Text style={styles.statText}>Total Products</Text>
-                <Text style={styles.statNumber}>
-                  {inventoryStats.totalProducts}
-                </Text>
+                <Text style={styles.statNumber}>{invSummary.totalQty}</Text>
               </View>
               <View style={styles.statSeparator} />
               <View style={styles.statItem}>
@@ -71,7 +100,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 />
                 <Text style={styles.statText}>Products In</Text>
                 <Text style={styles.statNumber}>
-                  {inventoryStats.productsIn}
+                  {invSummary.totalQty - invSummary.soldQty}
                 </Text>
               </View>
               <View style={styles.statSeparator} />
@@ -82,76 +111,83 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   color="#e74c3c"
                 />
                 <Text style={styles.statText}>Products Out</Text>
-                <Text style={styles.statNumber}>
-                  {inventoryStats.productsOut}
-                </Text>
+                <Text style={styles.statNumber}>{invSummary.soldQty}</Text>
               </View>
             </View>
           </Card.Content>
         </Card>
 
-        {/* Action Cards Container */}
-        <View style={styles.actionCardsContainer}>
-          {/* Billing Counter Card */}
-          <TouchableOpacity onPress={() => navigation.navigate("Billing")}>
-            <Card style={styles.actionCard}>
-              <Card.Content style={styles.actionCardContent}>
-                <MaterialCommunityIcons
-                  name="point-of-sale"
-                  size={48}
-                  color="#d4af37"
-                  onPress={() => navigation.navigate("Billing")}
-                />
-                <Text style={styles.actionCardTitle}>Billing Counter</Text>
-              </Card.Content>
-            </Card>
-          </TouchableOpacity>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => onRefresh(setRefreshing, fetchInventorySummary)}
+            />
+          }
+        >
+          {/* Action Cards Container */}
+          <View style={styles.actionCardsContainer}>
+            {/* Billing Counter Card */}
+            <TouchableOpacity onPress={() => navigation.navigate("Billing")}>
+              <Card style={styles.actionCard}>
+                <Card.Content style={styles.actionCardContent}>
+                  <MaterialCommunityIcons
+                    name="point-of-sale"
+                    size={48}
+                    color="#d4af37"
+                    onPress={() => navigation.navigate("Billing")}
+                  />
+                  <Text style={styles.actionCardTitle}>Billing Counter</Text>
+                </Card.Content>
+              </Card>
+            </TouchableOpacity>
 
-          {/* Inventory Management Card */}
-          <TouchableOpacity onPress={() => navigation.navigate("Inventory")}>
-            <Card style={styles.actionCard}>
-              <Card.Content style={styles.actionCardContent}>
-                <MaterialIcons
-                  name="category"
-                  size={48}
-                  color="#d4af37"
-                  onPress={() => navigation.navigate("Inventory")}
-                />
-                <Text style={styles.actionCardTitle}>SKU</Text>
-              </Card.Content>
-            </Card>
-          </TouchableOpacity>
-          {/*Inventory Screen */}
-          <TouchableOpacity
-            onPress={() => navigation.navigate("InventoryList")}
-          >
-            <Card style={styles.actionCard}>
-              <Card.Content style={styles.actionCardContent}>
-                <MaterialIcons
-                  name="store"
-                  size={48}
-                  color="#d4af37"
-                  onPress={() => navigation.navigate("InventoryList")}
-                />
-                <Text style={styles.actionCardTitle}>Inventory</Text>
-              </Card.Content>
-            </Card>
-          </TouchableOpacity>
-          {/* Ledger */}
-          <TouchableOpacity onPress={() => navigation.navigate("Sales")}>
-            <Card style={styles.actionCard}>
-              <Card.Content style={styles.actionCardContent}>
-                <MaterialIcons
-                  name="menu-book"
-                  size={48}
-                  color="#d4af37"
-                  onPress={() => navigation.navigate("Sales")}
-                />
-                <Text style={styles.actionCardTitle}>Sales</Text>
-              </Card.Content>
-            </Card>
-          </TouchableOpacity>
-        </View>
+            {/* Inventory Management Card */}
+            <TouchableOpacity onPress={() => navigation.navigate("Inventory")}>
+              <Card style={styles.actionCard}>
+                <Card.Content style={styles.actionCardContent}>
+                  <MaterialIcons
+                    name="category"
+                    size={48}
+                    color="#d4af37"
+                    onPress={() => navigation.navigate("Inventory")}
+                  />
+                  <Text style={styles.actionCardTitle}>SKU</Text>
+                </Card.Content>
+              </Card>
+            </TouchableOpacity>
+            {/*Inventory Screen */}
+            <TouchableOpacity
+              onPress={() => navigation.navigate("InventoryList")}
+            >
+              <Card style={styles.actionCard}>
+                <Card.Content style={styles.actionCardContent}>
+                  <MaterialIcons
+                    name="store"
+                    size={48}
+                    color="#d4af37"
+                    onPress={() => navigation.navigate("InventoryList")}
+                  />
+                  <Text style={styles.actionCardTitle}>Inventory</Text>
+                </Card.Content>
+              </Card>
+            </TouchableOpacity>
+            {/* Ledger */}
+            <TouchableOpacity onPress={() => navigation.navigate("Sales")}>
+              <Card style={styles.actionCard}>
+                <Card.Content style={styles.actionCardContent}>
+                  <MaterialIcons
+                    name="menu-book"
+                    size={48}
+                    color="#d4af37"
+                    onPress={() => navigation.navigate("Sales")}
+                  />
+                  <Text style={styles.actionCardTitle}>Sales</Text>
+                </Card.Content>
+              </Card>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     </GradientBackground>
   );

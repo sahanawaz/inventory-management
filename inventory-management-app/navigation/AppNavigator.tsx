@@ -59,7 +59,7 @@ const AppNavigator = () => {
         <Stack.Screen
           name="InventoryList"
           component={InventoryListScreen}
-          options={{ title: "InventoryList" }}
+          options={{ title: "Inventory List" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
