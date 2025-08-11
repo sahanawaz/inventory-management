@@ -3,14 +3,12 @@ import {
   Dimensions,
   FlatList,
   ListRenderItemInfo,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
 import GradientBackground from "../utils/GradientBackground";
-import { Card, DataTable, Text } from "react-native-paper";
-import { ledgerData } from "../utils/SysData";
+import { Card, Text } from "react-native-paper";
 import { DEFAULT_THEME_COLOR, ERR_MSG, months } from "../utils/SysConsts";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useFocusEffect } from "@react-navigation/native";

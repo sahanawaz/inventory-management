@@ -2,6 +2,7 @@ package inv.mgm.services.Repository;
 
 import inv.mgm.services.Entity.Inventory;
 import inv.mgm.services.Entity.InventoryInfo;
+import inv.mgm.services.Model.InventorySummaryResp;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,6 +28,14 @@ public interface InventoryRepository extends JpaRepository<InventoryInfo, Long> 
     """)
     List<InventoryInfo> findInventoryWherePurchasedGreaterThanSold(
             @Param("fromDt") LocalDate fromDt, @Param("toDt") LocalDate toDt, @Param("sku") String sku);
+
+    @Query(value = """
+            SELECT
+            	SUM(ii.purchased_quantity) total_qty,
+            	SUM(ii.sold_quantity) sold_qty
+            FROM inventory_info  ii
+            """, nativeQuery = true)
+    InventorySummaryResp getInventorySummary();
 
 
 }
