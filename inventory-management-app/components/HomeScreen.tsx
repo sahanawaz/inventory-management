@@ -41,7 +41,7 @@ type InventorySummaryInterface = {
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const { startAnimation, stopAnimation } = useLoader();
+  const { startAnimation, stopAnimation, Loader } = useLoader();
   const [refreshing, setRefreshing] = useState(false);
   const [invSummary, setInvSummary] = useState<InventorySummaryInterface>({
     totalQty: 0,
@@ -73,6 +73,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <GradientBackground>
       <SafeAreaView style={styles.safeArea}>
+        {Loader}
         {/* Header */}
         <View style={styles.headerContainer}>
           <Text style={styles.headerTitle}>Welcome to Shine Collection</Text>

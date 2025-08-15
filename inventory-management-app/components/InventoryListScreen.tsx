@@ -2,22 +2,19 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   Dimensions,
   FlatList,
-  FlatListProps,
   ListRenderItemInfo,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
 } from "react-native";
 import GradientBackground from "../utils/GradientBackground";
-import { Card, DataTable, IconButton, Text } from "react-native-paper";
-import { ledgerData } from "../utils/SysData";
+import { Card, IconButton, Text } from "react-native-paper";
 import { DEFAULT_THEME_COLOR, ERR_MSG, months } from "../utils/SysConsts";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useFocusEffect } from "@react-navigation/native";
 import useAlertModal from "../helper/useAlertModal";
 import useLoader from "../helper/useLoader";
-import { CallApiGet, CallApiPost } from "../utils/ServiceHelper";
+import { CallApiPost } from "../utils/ServiceHelper";
 import { InventoryItemType, SkuClass } from "../shared/SharedInterface";
 import FilterSkuModal from "./FilterSkuModal";
 import { URL } from "../utils/UrlConstants";
@@ -26,7 +23,7 @@ const { width, height } = Dimensions.get("window");
 const InventoryListScreen = () => {
   const { showModal, Modal } = useAlertModal();
   const [openFilter, setOpenFilter] = useState(false);
-  const { startAnimation, stopAnimation } = useLoader();
+  const { startAnimation, stopAnimation, Loader } = useLoader();
   const [locDate, setLocDate] = useState<{
     startDate: Date;
     endDate: Date;
@@ -45,7 +42,7 @@ const InventoryListScreen = () => {
       let lstartDate = new Date();
       lstartDate.setDate(lendDate.getDate() - 7);
       setLocDate({ startDate: lstartDate, endDate: lendDate });
-      fetchInventory(lstartDate, lendDate);
+      // fetchInventory(lstartDate, lendDate);
     }, [])
   );
 
@@ -211,6 +208,7 @@ const InventoryListScreen = () => {
   return (
     <GradientBackground>
       {Modal}
+      {Loader}
       <View style={styles.content}>
         {/* Summary Card with Vertical Divider */}
         <Card style={styles.summaryCard}>
